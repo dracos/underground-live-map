@@ -1,0 +1,20 @@
+#!/usr/bin/python
+
+import simplejson as json
+import re, sys
+
+lines = json.load(open('lines_for_stations.json'))
+
+coord_replace = {}
+fp = open('london-stations-new.js')
+for line in fp:
+    m = re.search('name:"([^"]*)" }', line)
+    if m:
+        sn = m.group(1)
+        #sn = sn.replace('Bromley-by-Bow', 'Bromley-By-Bow')
+        sn = re.sub(' Station$', '', sn)
+        if sn in lines:
+            pretty = " (" + ', '.join(lines[sn]) + ")"
+            line = line.replace(m.group(0), 'name:"%s%s" }' % (sn, pretty))
+    print line,
+

@@ -1,0 +1,54 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+  "http://www.w3.org/TR/html4/strict.dtd">
+<html xmlns:v="urn:schemas-microsoft-com:vml">
+ <head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>Live map of London Underground trains</title>
+  <link href="css.css" type="text/css" rel="stylesheet">
+  <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAr0jEilTj74QAOSQ54V3GrxTwQSawC5yN9rAPq2diDIvxqz2lVRR6lF9P-tXKlfSvPmhASovImKIjbw" type="text/javascript"></script>
+  <script type="text/javascript" src="js/pdmarker.js"></script>
+  <script type="text/javascript" src="js/trains.js"></script>
+ </head>
+ <body onunload="GUnload()">
+  <h1>Live train map for <span id="station_name"></span></h1>
+<noscript>
+<div style="border: solid 2px #cc0000; padding: 5px; width: 70%; margin: 1em auto;">
+I'm afraid that this page requires JavaScript to interface with Google Maps
+and the data to plot and move the trains, which isn't possible with just HTML.
+However, all the data used to generate the map is accessible and available from
+<a href="http://www.nationalrail.co.uk/">National Rail's website</a>. &mdash;
+Matthew
+</div>
+</noscript>
+  <p>
+   <small>Data collected: <span id="update">No data yet</span></small></p>
+  <div id="map"><div style="padding: 1em; color: gray;">Loading...</div></div>
+  <div id="loading"></div>
+  <div id="info">
+
+<p id="showhide"><a href="" onclick="Info.Hide(); return false;">Hide &raquo;</a>
+
+<h2>What is this?</h2>
+<p>This map shows all trains on the London Underground network.
+The yellow pins are stations (click for a local map of that
+station), the red pins trains. The trains move in approximately real 
+time. <a href="../">National Rail version</a></p>
+
+<h2>How does it work?</h2>
+<p>Live departure data is fetched from the <a href="http://data.london.gov.uk/apibeta">TfL API</a>, and then it does
+a bit of maths and magic. It&rsquo;s surprisingly okay given this
+was done in a few hours and the many naming/location issues, some
+unresolved (a small number of stations are misplaced or missing;
+inter-station journey times need improvement).</p>
+
+<h2>Who did this?</h2>
+<p><a href="http://twitter.com/dracos">Matthew Somerville</a>
+(with helpful hinderances from <a href="http://twitter.com/phae">Frances Berriman</a> and <a href="http://twitter.com/jaylett">James Aylett</a>).
+</p>
+
+<p id="footer">Woo, thanks TfL! Now how about it, National Rail?
+Open train data is good for everyone.</p>
+  </div>
+  <script type="text/javascript"> load(); </script>
+ </body>
+</html>
