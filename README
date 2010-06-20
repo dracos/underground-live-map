@@ -1,0 +1,15 @@
+underground-live-map
+====================
+
+http://traintimes.org.uk/map/tube/
+
+This uses the TfL API to plot the approximate live locations of
+all the trains on the London Underground.
+
+It is very hacky. Built on top of many-years-old code, with
+many hacks to get things working. But here it is anyway. Feel
+free to improve, it shouldn't be hard!
+
+Matthew Somerville
+http://www.dracos.co.uk/
+http://twitter.com/dracos
