@@ -128,7 +128,6 @@ Station.prototype = new PdMarker(new GLatLng(1,1), yellowPin);
 		var date = data.lastupdate;
 		document.getElementById('update').innerHTML = date;
 		map.date = new Date(date);
-		document.getElementById('station_name').innerHTML = data.station;
 
 		// Centre and zoom map, only the first time
 		if (refresh) {
