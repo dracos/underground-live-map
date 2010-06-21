@@ -10,6 +10,31 @@ It is very hacky. Built on top of many-years-old code, with
 many hacks to get things working. But here it is anyway. Feel
 free to improve, it shouldn't be hard!
 
+Possible TODOs
+--------------
+* Fix the remaining stations that are misplaced, consolidate all
+  the station/ line information into one authoritative file.
+* Improve station canonicalisation.
+* Occasionally more than one train on a line with the same ID (e.g.
+  saw two 477s on Northern this morning), the code currently munges
+  them together leading to an oddly-behaving train;
+* A couple of trains do do weird things in the data, rushing from
+  one end to another and back - is this in the source or is the
+  script that reads the source making a mistake somehow?
+* Are 000 ID trains to be trusted?
+* Initial placement of trains assumes constant inter-station journey
+  time. Locate a file of journey times and use that instead. (Doesn't
+  matter /too/ much as the front end code will get the train to the
+  next station at the right time, hopefully.)
+* Store history of live API results so can be used for "Approaching"
+  trains to know where they were, and for moreuses than that.
+* Much improve the front end so e.g. it fetches updates every couple
+  of minutes via AJAX and (because most trains are IDed) can fix the
+  train locations automatically. Currently, you won't really get any
+  updates to actual locations (as opposed to computed locations)
+  without hitting refresh.
+
+
 Matthew Somerville
 http://www.dracos.co.uk/
 http://twitter.com/dracos
