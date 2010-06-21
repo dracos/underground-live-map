@@ -29,21 +29,22 @@ Matthew
 <p id="showhide"><a href="" onclick="Info.Hide(); return false;">Hide &raquo;</a>
 
 <h2>What is this?</h2>
-<p>This map shows all trains on the London Underground network.
+<p>This map shows all trains on the London Underground network
+in approximately real time.
 The yellow pins are stations (click for a local map of that
-station), the red pins trains. The trains move in approximately real 
-time. I have a (per-station) <a href="../">National Rail version</a>,
+station), the red pins trains.
+I have a (per-station) <a href="../">National Rail version</a>,
 and a <a href="/">bookmarkable journey planner</a>.</p>
 
 <h2>How does it work?</h2>
 <p>Live departure data is fetched from the <a href="http://data.london.gov.uk/apibeta">TfL API</a>, and then it does
 a bit of maths and magic. It&rsquo;s surprisingly okay given this
 was done in only a few hours at <a href="http://sciencehackday.com/">Science Hackday</a>
-and the many naming/location issues, some
-unresolved (a small number of stations are misplaced or missing;
-inter-station journey times need improvement; <em>occasional trains
-behave oddly due to duplicate IDs</em>; some H&amp;C stations are
-missing in the TfL feed).</p>
+and the many naming/location issues encountered, some
+unresolved. A small number of stations are misplaced or missing;
+occasional trains behave oddly due to duplicate IDs; some H&amp;C stations are
+missing in the TfL feed; the front end doesn't update from the
+back end feed (<em>hit refresh for now</em>).</p>
 
 <h2>Who did this?</h2>
 <p><a href="http://twitter.com/dracos">Matthew Somerville</a>
