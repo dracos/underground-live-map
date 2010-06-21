@@ -101,6 +101,7 @@ def canon_station_name(s, line):
     s = re.sub('^Heathrow$', 'Heathrow Terminals 1, 2, 3', s)
     s = re.sub('^Olympia$', 'Kensington (Olympia)', s)
     s = re.sub('^Warwick Ave$', 'Warwick Avenue', s)
+    s = re.sub('^Central$', 'Finchley Central', s) # They say "Between Central and East Finchley"
     s = re.sub('\s*Platform \d$', '', s)
     s = s + ' Station'
     s = s.replace('(Bakerloo)', 'Bakerloo').replace('Earls', 'Earl\'s') \
@@ -119,6 +120,7 @@ def canon_station_name(s, line):
         .replace('Terminals 123', 'Terminals 1, 2, 3').replace('Terminal 1,2,3', 'Terminals 1, 2, 3') \
         .replace('Woodford Junction', 'Woodford') \
         .replace("King's Cross Station", "King's Cross St. Pancras Station") \
+        .replace("Kings Cross Station", "King's Cross St. Pancras Station") \
         .replace('Central Finchley', 'Finchley Central').replace('District and Picc', 'D &amp; P') \
         .replace('South Fields', 'Southfields') \
         .replace('Regents Park', "Regent's Park") \
