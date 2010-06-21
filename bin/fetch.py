@@ -109,11 +109,14 @@ def canon_station_name(s, line):
         .replace('St ', 'St. ') \
         .replace('Elephant and Castle', 'Elephant &amp; Castle') \
         .replace('Lambeth Station', 'Lambeth North Station') \
+        .replace('Chalfont Station', 'Chalfont &amp; Latimer Station') \
         .replace('West Brompon', 'West Brompton') \
         .replace('Picadilly Circus', 'Piccadilly Circus') \
         .replace('High Barent', 'High Barnet') \
+        .replace('Bartnet', 'Barnet') \
         .replace('Turnham Greens', 'Turnham Green') \
         .replace('Ruilsip', 'Ruislip') \
+        .replace('Dagemham', 'Dagenham') \
         .replace('Edgware Road (H &amp; C)', 'Edgware Road Circle') \
         .replace('Hammersmith (Circle and H&amp;C)', 'Hammersmith') \
         .replace('Shepherds Bush (Central Line)', "Shepherd's Bush") \
@@ -125,6 +128,7 @@ def canon_station_name(s, line):
         .replace('South Fields', 'Southfields') \
         .replace('Regents Park', "Regent's Park") \
         .replace('Bromley-by-Bow', "Bromley-By-Bow") \
+        .replace('Brent Oak', 'Burnt Oak') \
         .replace('St. Johns Wood', "St. John's Wood") \
         .replace('Totteridge and Whetstone', 'Totteridge &amp; Whetstone') \
         .replace('Newbury Park Loop', 'Newbury Park') \
