@@ -14,6 +14,7 @@ Possible TODOs
 --------------
 * Fix the remaining stations that are misplaced, consolidate all
   the station/ line information into one authoritative file.
+* Locate the Depots, Sidings and other non-station places they can be.
 * Improve station canonicalisation.
 * Occasionally more than one train on a line with the same ID (e.g.
   saw two 477s on Northern this morning), the code currently munges

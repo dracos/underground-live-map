@@ -100,8 +100,8 @@ def canon_station_name(s, line):
     s = s.strip()
     s = re.sub('^Heathrow$', 'Heathrow Terminals 1, 2, 3', s)
     s = re.sub('^Olympia$', 'Kensington (Olympia)', s)
-    s = re.sub('Warwick Ave$', 'Warwick Avenue', s)
-    s = re.sub('Platform \d$', '', s)
+    s = re.sub('^Warwick Ave$', 'Warwick Avenue', s)
+    s = re.sub('\s*Platform \d$', '', s)
     s = s + ' Station'
     s = s.replace('(Bakerloo)', 'Bakerloo').replace('Earls', 'Earl\'s') \
         .replace('\xe2\x80\x99', "'") \
@@ -112,6 +112,7 @@ def canon_station_name(s, line):
         .replace('Picadilly Circus', 'Piccadilly Circus') \
         .replace('High Barent', 'High Barnet') \
         .replace('Turnham Greens', 'Turnham Green') \
+        .replace('Ruilsip', 'Ruislip') \
         .replace('Edgware Road (H &amp; C)', 'Edgware Road Circle') \
         .replace('Hammersmith (Circle and H&amp;C)', 'Hammersmith') \
         .replace('Shepherds Bush (Central Line)', "Shepherd's Bush") \
@@ -140,6 +141,7 @@ for line, ids in out.items():
         if 'Road 21' in arr['current_location']: continue # List doesn't have its location
         if 'ALperton' in arr['current_location']: continue # List doesn't have its location
         if 'Headstone Lane' in arr['current_location']: continue # List doesn't have its location
+        if 'Depot' in arr['current_location']: continue
         station_name = canon_station_name(arr['station_name'], line)
         if arr['current_location'] == 'At Platform':
             arr['location'] = station_locations[station_name]
@@ -152,14 +154,14 @@ for line, ids in out.items():
         m = re.match('Between (.*?) and (.*)', arr['current_location'])
         if m:
             location_1 = station_locations[canon_station_name(m.group(1), line)]
-            location_2 = station_locations[canon_station_name(m.group(2).strip(), line)]
+            location_2 = station_locations[canon_station_name(m.group(2), line)]
             if time_to_station > 150: time_to_station = 150
             fraction = (180-time_to_station) / 180
             arr['location'] = (location_1[0] + (fraction*(location_2[0]-location_1[0])), location_1[1] + (fraction*(location_2[1]-location_1[1])))
         m = re.match('Approaching (.*)', arr['current_location'])
         if m:
             # Don't know where we were previously, can't be bothered to work it out, needs to store history!
-            arr['location'] = station_locations[canon_station_name(m.group(1).strip(), line)]
+            arr['location'] = station_locations[canon_station_name(m.group(1), line)]
    
 if format=='rss':
     print '''<?xml version="1.0" encoding="UTF-8"?>
