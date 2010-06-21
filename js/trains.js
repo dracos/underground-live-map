@@ -1,6 +1,7 @@
 var map = null;
 var stations = new Array();
 var trains = new Array();
+//var train_by_id = new Array();
 var starttime = new Date();
 var extra = 0;
 var Speed = 1;
@@ -15,7 +16,7 @@ function load() {
 		map.addControl(new GOverviewMapControl());
 		map.addControl(new GScaleControl());
 		map.setCenter(new GLatLng(51.507, -0.143), 12);
-		Update.map(true);
+		Update.mapStart();
 	}
 }
 
@@ -37,13 +38,8 @@ var greenPin = new GIcon(basePin);
 
 function Train(train) {
 	this.inheritFrom = PdMarker;
-	this.startPoint = train.point;
-	this.justLeft = train.left;
-	this.title = train.title;
-	this.string = train.string;
+    this.updateDetails(train);
 	this.info = '';
-	this.link = train.link
-	this.route = train.next;
 	this.calculateLocation();
 	this.inheritFrom(this.point, redPin);
 	this.createTitle();
@@ -56,6 +52,14 @@ Train.prototype.createTitle = function() {
 	//if (html != this.getTooltip()) this.setTooltip(html);
 	if (this.link) html += '<br><a href="'+this.link+'">View board</a>'
 	this.setDetailWinHTML(html);
+};
+Train.prototype.updateDetails = function(train) {
+	this.startPoint = train.point;
+	this.justLeft = train.left;
+	this.title = train.title;
+	this.string = train.string;
+	this.link = train.link
+	this.route = train.next;
 };
 Train.prototype.calculateLocation = function() {
 	var now = new Date();
@@ -114,6 +118,12 @@ Station.prototype = new PdMarker(new GLatLng(1,1), yellowPin);
 
 // Updates from server, site, and periodically
  Update = {
+    mapStart: function() {
+        Update.map(true);
+    },
+    mapSubsequent: function() {
+        Update.map(false);
+    },
     map: function(refresh) {
 	var name = 'london';
 	Message.showWait();
@@ -129,10 +139,10 @@ Station.prototype = new PdMarker(new GLatLng(1,1), yellowPin);
 		document.getElementById('update').innerHTML = date;
 		map.date = new Date(date);
 
+		map.clearOverlays();
+		trains = [];
 		// Centre and zoom map, only the first time
 		if (refresh) {
-			map.clearOverlays();
-			trains = [];
 			var center = data.center;
 			var span = data.span;
 			var center_lng = center.lng();
@@ -146,7 +156,7 @@ Station.prototype = new PdMarker(new GLatLng(1,1), yellowPin);
 				var zoom = map.getBoundsZoomLevel(new GLatLngBounds(sw, ne)) + 3;
 			}
 			map.setCenter(center, zoom);
-		}
+        }
 
 		var lines = data.polylines
 		for (l=0; lines && l<lines.length; l++) {
@@ -159,9 +169,10 @@ Station.prototype = new PdMarker(new GLatLng(1,1), yellowPin);
 
 		var markers = data.stations;
 		if (data.trains) markers = markers.concat(data.trains);
+
 		var pos = 0;
 		window.setTimeout(plotMarkers, 165);
-		window.setTimeout(Update.map, 1000*60*15);
+		window.setTimeout(Update.mapSubsequent, 1000*60*2);
 
 		function plotMarkers() {
 			if (markers && pos < markers.length) {
@@ -172,16 +183,23 @@ Station.prototype = new PdMarker(new GLatLng(1,1), yellowPin);
 						map.addOverlay(station);
 						stations[stations.length] = station;
 					} else if (markers[pos].title) { // Train
+                        //var train_id = markers[pos].id;
+                        //if (train_by_id[train_id]) {
+						//    train = train_by_id[train_id];
+                        //    train.updateDetails(markers[pos]);
+                        //} else {
 						var train = new Train(markers[pos]);
 						map.addOverlay(train);
 						trains[trains.length] = train;
+                        //    train_by_id[train_id] = train;
+                        //}
 					}
 					pos++;
 				}
 				window.setTimeout(plotMarkers, 165);
 			} else {
 				Message.hideBox();
-				window.setTimeout(Update.trains, 1000);
+                if (refresh) window.setTimeout(Update.trains, 1000);
 			}
 		}
 

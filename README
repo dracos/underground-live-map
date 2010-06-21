@@ -35,11 +35,11 @@ Possible TODOs
   next station at the right time, hopefully.)
 * Store history of live API results so can be used for "Approaching"
   trains to know where they were, and for moreuses than that.
-* Much improve the front end so e.g. it fetches updates every couple
-  of minutes via AJAX and (because most trains are IDed) can fix the
-  train locations automatically. Currently, you won't really get any
-  updates to actual locations (as opposed to computed locations)
-  without hitting refresh.
+* Much improve the front end so e.g. when it fetches updates every couple
+  of minutes via AJAX, it doesn't just redraw the entire map, but
+  cleverly updates train positions. Given the server-given starting
+  position isn't currently that great, that would need improving too
+  to prevent large jumps.
 
 
 Matthew Somerville
