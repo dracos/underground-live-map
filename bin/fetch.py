@@ -3,17 +3,14 @@
 from __future__ import division 
 import urllib
 import re
-import cgi
 import simplejson as json
 import time
 import os
 import os.path
-import sys
+import mx.DateTime
 
 dir = '/srv/traintimes.org.uk/public/htdocs/map/tube/bin/'
 
-format = 'rss'
-format = 'json'
 format = 'traintimes'
 
 api = 'http://apibeta.london.gov.uk/TrackernetWebServicev3/timetableService.aspx?Feed=4&Line=%s&StationCode=&Time='
@@ -172,43 +169,7 @@ for line, ids in out.items():
             # Don't know where we were previously, can't be bothered to work it out, needs to store history!
             arr['location'] = station_locations[canon_station_name(m.group(1), line)]
    
-if format=='rss':
-    print '''<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0"
-xmlns:blogChannel="http://backend.userland.com/blogChannelModule"
-xmlns:georss="http://www.georss.org/georss">
-<channel>
-<link>http://www.example.org</link>
-<title>Live tube locations</title>
-<description>See where they are</description>
-<language>en-gb</language>
-'''
-
-    for line, ids in out.items():
-        for id, arr in ids.items():
-            if 'location' not in arr: continue
-            print '''<item>
-  <title>Tube %s, %s line</title>
-  <link>http://www.example.org</link>
-  <description>%s; report from %s</description>
-  <georss:point>%f %f</georss:point>
-  </item>
-''' % (id, cgi.escape(lines[line]), arr['current_location'], arr['station_name'], arr['location'][0], arr['location'][1])
-
-    print '</channel></rss>'
-
-elif format=='json':
-    outJ = []
-    for line, ids in out.items():
-        for id, arr in ids.items():
-            if 'location' not in arr: continue
-            arr['id'] = id
-            arr['line'] = lines[line]
-            outJ.append(arr)
-    print json.dumps(outJ, indent=4)
-
-elif format=='traintimes':
-    import mx.DateTime
+if format=='traintimes':
     outJ = {
         'station': 'London Underground',
         'center': 'new GLatLng(51.507, -0.143)',
@@ -238,10 +199,9 @@ elif format=='traintimes':
                 })
             outJ['trains'].append({
                 'point': 'new GLatLng(%s,%s)' % arr['location'],
-                'string': '',
-                'link': '',
                 'next': next,
                 'left': '',
+                'id': '%s-%s' % (line, id),
                 'title': lines[line] + ' train (' + id + ')',
             })
     grr = json.dumps(outJ, indent=4)
