@@ -109,6 +109,7 @@ def canon_station_name(s, line):
         .replace('Elephant and Castle', 'Elephant &amp; Castle') \
         .replace('Lambeth Station', 'Lambeth North Station') \
         .replace('Chalfont Station', 'Chalfont &amp; Latimer Station') \
+        .replace('Chalfont and Latimer Station', 'Chalfont &amp; Latimer Station') \
         .replace('West Brompon', 'West Brompton') \
         .replace('Picadilly Circus', 'Piccadilly Circus') \
         .replace('High Barent', 'High Barnet') \

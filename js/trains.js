@@ -139,10 +139,11 @@ Station.prototype = new PdMarker(new GLatLng(1,1), yellowPin);
 		document.getElementById('update').innerHTML = date;
 		map.date = new Date(date);
 
-		map.clearOverlays();
-		trains = [];
+        var markers;
 		// Centre and zoom map, only the first time
 		if (refresh) {
+		    map.clearOverlays();
+		    trains = [];
 			var center = data.center;
 			var span = data.span;
 			var center_lng = center.lng();
@@ -156,19 +157,27 @@ Station.prototype = new PdMarker(new GLatLng(1,1), yellowPin);
 				var zoom = map.getBoundsZoomLevel(new GLatLngBounds(sw, ne)) + 3;
 			}
 			map.setCenter(center, zoom);
+
+		    var lines = data.polylines
+		    for (l=0; lines && l<lines.length; l++) {
+			    var line = lines[l];
+                var colour = line.shift();
+			    if (!line.length) continue;
+			    var polyline = new GPolyline(line, colour, 4, 0.9);
+			    map.addOverlay(polyline);
+		    }
+
+		    markers = data.stations;
+		    if (data.trains) markers = markers.concat(data.trains);
+
+        } else {
+	        for (i=0; i<trains.length; i++) {
+		        var train = trains[i];
+		        map.removeOverlay(train);
+	        }
+            trains = [];
+		    markers = data.trains;
         }
-
-		var lines = data.polylines
-		for (l=0; lines && l<lines.length; l++) {
-			var line = lines[l];
-            var colour = line.shift();
-			if (!line.length) continue;
-			var polyline = new GPolyline(line, colour, 4, 0.9);
-			map.addOverlay(polyline);
-		}
-
-		var markers = data.stations;
-		if (data.trains) markers = markers.concat(data.trains);
 
 		var pos = 0;
 		window.setTimeout(plotMarkers, 165);
