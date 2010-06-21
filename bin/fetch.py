@@ -101,10 +101,12 @@ def canon_station_name(s, line):
     s = re.sub('^Heathrow$', 'Heathrow Terminals 1, 2, 3', s)
     s = re.sub('^Olympia$', 'Kensington (Olympia)', s)
     s = re.sub('^Warwick Ave$', 'Warwick Avenue', s)
+    s = re.sub('^Camden$', 'Camden Town', s)
     s = re.sub('^Central$', 'Finchley Central', s) # They say "Between Central and East Finchley"
     s = re.sub('\s*Platform \d$', '', s)
     s = s + ' Station'
     s = s.replace('(Bakerloo)', 'Bakerloo').replace('Earls', 'Earl\'s') \
+        .replace(' fast ', ' ') \
         .replace('\xe2\x80\x99', "'") \
         .replace('St ', 'St. ') \
         .replace('Elephant and Castle', 'Elephant &amp; Castle') \
@@ -114,6 +116,7 @@ def canon_station_name(s, line):
         .replace('Picadilly Circus', 'Piccadilly Circus') \
         .replace('High Barent', 'High Barnet') \
         .replace('Bartnet', 'Barnet') \
+        .replace('Faringdon', 'Farringdon') \
         .replace('Turnham Greens', 'Turnham Green') \
         .replace('Ruilsip', 'Ruislip') \
         .replace('Dagemham', 'Dagenham') \
