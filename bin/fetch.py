@@ -100,6 +100,7 @@ def canon_station_name(s, line):
     s = s.strip()
     s = re.sub('^Heathrow$', 'Heathrow Terminals 1, 2, 3', s)
     s = re.sub('^Olympia$', 'Kensington (Olympia)', s)
+    s = re.sub('Warwick Ave$', 'Warwick Avenue', s)
     s = re.sub('Platform \d$', '', s)
     s = s + ' Station'
     s = s.replace('(Bakerloo)', 'Bakerloo').replace('Earls', 'Earl\'s') \
@@ -108,7 +109,9 @@ def canon_station_name(s, line):
         .replace('Elephant and Castle', 'Elephant &amp; Castle') \
         .replace('Lambeth Station', 'Lambeth North Station') \
         .replace('West Brompon', 'West Brompton') \
+        .replace('Picadilly Circus', 'Piccadilly Circus') \
         .replace('High Barent', 'High Barnet') \
+        .replace('Turnham Greens', 'Turnham Green') \
         .replace('Edgware Road (H &amp; C)', 'Edgware Road Circle') \
         .replace('Hammersmith (Circle and H&amp;C)', 'Hammersmith') \
         .replace('Shepherds Bush (Central Line)', "Shepherd's Bush") \
