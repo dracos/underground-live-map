@@ -44,6 +44,8 @@ def parse_time(s):
 out = {}
 outNext = {}
 for key, line in lines.items():
+    sub_id = 0
+    sub_ids = {}
     try:
         if time.time() - os.path.getmtime('cache/%s' % key) > 100:
             raise Exception, 'Too old'
@@ -63,6 +65,14 @@ for key, line in lines.items():
                 if 'Terminal 5' in station_name: continue # List doesn't have its location
                 if 'Road 21' in station_name: continue # List doesn't have its location
                 time_to_station = parse_time(time_to_station)
+                if set_id == '000':
+                    lookup = re.sub('\s*Platform \d+$', '', current_location)
+                    if current_location == 'At Platform':
+                        lookup = 'At %s' % station_name
+                    if not sub_ids.get(lookup):
+                        sub_ids[lookup] = sub_id
+                        sub_id += 1
+                    set_id += '-%s' % sub_ids[lookup]
                 if time_to_station < out.get(key, {}).get(set_id, {}).get('time_to_station', 999999):
                     out.setdefault(key, {})[set_id] = {
                         'station_name': re.sub('\.$', '', station_name),
@@ -100,7 +110,7 @@ def canon_station_name(s, line):
     s = re.sub('^Warwick Ave$', 'Warwick Avenue', s)
     s = re.sub('^Camden$', 'Camden Town', s)
     s = re.sub('^Central$', 'Finchley Central', s) # They say "Between Central and East Finchley"
-    s = re.sub('\s*Platform \d$', '', s)
+    s = re.sub('\s*Platform \d+$', '', s)
     s = s + ' Station'
     s = s.replace('(Bakerloo)', 'Bakerloo').replace('Earls', 'Earl\'s') \
         .replace(' fast ', ' ') \
