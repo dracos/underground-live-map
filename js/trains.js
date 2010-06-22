@@ -25,13 +25,15 @@ var basePin = new GIcon();
 	basePin.shadowSize = new GSize(22,20);
 	basePin.iconAnchor = new GPoint(6,20);
 	basePin.infoWindowAnchor = new GPoint(5,1);
-var redPin = new GIcon(basePin);
-	redPin.image = "http://traintimes.org.uk:81/map/tube/i/pin_red.png";
-//	redPin.image = "i/train.gif";
-//	redPin.iconSize = new GSize(32, 28);
-//	redPin.iconAnchor = new GPoint(16, 20);
-var yellowPin = new GIcon(basePin);
-	yellowPin.image = "http://traintimes.org.uk:81/map/tube/i/pin_yellow.png";
+var trainPin = new GIcon(basePin);
+	trainPin.image = "http://traintimes.org.uk:81/map/tube/i/pin_yellow.png";
+//	trainPin.image = "i/train.gif";
+//	trainPin.iconSize = new GSize(32, 28);
+//	trainPin.iconAnchor = new GPoint(16, 20);
+var stationPin = new GIcon(basePin);
+	stationPin.image = "http://traintimes.org.uk:81/map/tube/i/station.png";
+    stationPin.iconSize = new GSize(20, 20);
+    stationPin.iconAnchor = new GPoint(10, 20);
 var greenPin = new GIcon(basePin);
 	greenPin.image = "http://traintimes.org.uk:81/map/tube/i/pin_green.png";
 
@@ -40,10 +42,10 @@ function Train(train) {
     this.updateDetails(train);
 	this.info = '';
 	this.calculateLocation();
-	this.inheritFrom(this.point, redPin);
+	this.inheritFrom(this.point, trainPin);
 	this.createTitle();
 }
-Train.prototype = new PdMarker(new GLatLng(1,1), redPin);
+Train.prototype = new PdMarker(new GLatLng(1,1), trainPin);
 Train.prototype.createTitle = function() {
 	var html = '';
 	html = this.title + '<br>' + this.info;
@@ -97,7 +99,7 @@ function Station(station) {
 	this.point = station.point;
 	this.name = station.name;
 	this.inheritFrom = PdMarker;
-	this.inheritFrom(station.point, yellowPin);
+	this.inheritFrom(station.point, stationPin);
 	this.setTooltip(this.name);
 GEvent.addListener(this, 'mouseover', function() {
         if (this.inMouseOver) return;
@@ -113,7 +115,7 @@ GEvent.addListener(this, 'mouseout', function() {
 		this.showMapBlowup(15);
 	});
 }
-Station.prototype = new PdMarker(new GLatLng(1,1), yellowPin);
+Station.prototype = new PdMarker(new GLatLng(1,1), stationPin);
 
 // Updates from server, site, and periodically
  Update = {
