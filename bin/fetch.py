@@ -73,21 +73,16 @@ for key, line in lines.items():
                         sub_ids[lookup] = sub_id
                         sub_id += 1
                     set_id += '-%s' % sub_ids[lookup]
-                if time_to_station < out.get(key, {}).get(set_id, {}).get('time_to_station', 999999):
-                    out.setdefault(key, {})[set_id] = {
-                        'station_name': re.sub('\.$', '', station_name),
-                        'platform_name': platform_name,
-                        'current_location': current_location,
-                        'time_to_station': time_to_station,
-                        'dest_code': dest_code,
-                    }
-                outNext.setdefault(key, {}).setdefault(set_id, []).append({
+                entry = {
                     'station_name': re.sub('\.$', '', station_name),
                     'platform_name': platform_name,
                     'current_location': current_location,
                     'time_to_station': time_to_station,
                     'dest_code': dest_code,
-                })
+                }
+                if time_to_station < out.get(key, {}).get(set_id, {}).get('time_to_station', 999999):
+                    out.setdefault(key, {})[set_id] = entry
+                outNext.setdefault(key, {}).setdefault(set_id, []).append(entry)
                 #print '%s %s %s | %s %s %s' % (key, station_name, platform_name, set_id, time_to_station, current_location)
 
 # Remove trains that have the same ID and dest_code, but a higher time_to_station - probably the same train
@@ -116,12 +111,15 @@ def canon_station_name(s, line):
         .replace(' fast ', ' ') \
         .replace('\xe2\x80\x99', "'") \
         .replace('St ', 'St. ') \
+        .replace('Warren St.', 'Warren Street') \
         .replace('Elephant and Castle', 'Elephant &amp; Castle') \
+        .replace('Elephant Station', 'Elephant &amp; Castle Station') \
         .replace('Lambeth Station', 'Lambeth North Station') \
         .replace('Chalfont Station', 'Chalfont &amp; Latimer Station') \
         .replace('Chalfont and Latimer Station', 'Chalfont &amp; Latimer Station') \
         .replace('West Brompon', 'West Brompton') \
         .replace('Picadilly Circus', 'Piccadilly Circus') \
+        .replace("Queen's' Park", "Queen's Park") \
         .replace('High Barent', 'High Barnet') \
         .replace('Bartnet', 'Barnet') \
         .replace('Faringdon', 'Farringdon') \
