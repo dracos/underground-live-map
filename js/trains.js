@@ -4,7 +4,6 @@ var trains = new Array();
 //var train_by_id = new Array();
 var starttime = new Date();
 var extra = 0;
-var Speed = 1;
 
 function load() {
 	if (GBrowserIsCompatible()) {
@@ -63,7 +62,7 @@ Train.prototype.updateDetails = function(train) {
 };
 Train.prototype.calculateLocation = function() {
 	var now = new Date();
-	var secs = (starttime - map.date)/1000 + extra + (now - starttime)/1000*Speed;
+	var secs = (starttime - map.date)/1000 + extra + (now - starttime)/1000;
 	var point = 0;
 	var from = this.startPoint;
 	var from_name = this.justLeft;
@@ -220,17 +219,6 @@ Station.prototype = new PdMarker(new GLatLng(1,1), yellowPin);
 		train.recalculateLocation();
 	}
 	window.setTimeout(Update.trains, 1000);
-    },
-    speed: function() {
-	var speed = document.getElementById('speedy');
-	var now = new Date();
-	if (speed.checked) {
-		Speed = 10;
-	} else {
-		extra += (now - starttime)/1000*(Speed-1);
-		Speed = 1;
-	}
-	starttime = now;
     },
     mapSize: function() {
 	var m = document.getElementById('map');
