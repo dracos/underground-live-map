@@ -163,8 +163,9 @@ Station.prototype = new PdMarker(new GLatLng(1,1), stationPin);
 		    for (l=0; lines && l<lines.length; l++) {
 			    var line = lines[l];
                 var colour = line.shift();
+                var opac = line.shift();
 			    if (!line.length) continue;
-			    var polyline = new GPolyline(line, colour, 4, 0.9);
+			    var polyline = new GPolyline(line, colour, 4, opac);
 			    map.addOverlay(polyline);
 		    }
 
