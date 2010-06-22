@@ -16,7 +16,7 @@ stations: [
  { point: new GLatLng(51.5394512085, 0.0808631828494), name:"Barking (District, Hammersmith & City)" } ,
  { point: new GLatLng(51.5857859604, 0.0885110138218), name:"Barkingside (Central)" } ,
  { point: new GLatLng(51.4901599427, -0.213606857361), name:"Barons Court (District, Piccadilly)" } ,
- { point: new GLatLng(51.5122330587, -0.188038262222), name:"Bayswater (District, Circle)" } ,
+ // { point: new GLatLng(51.5122330587, -0.188038262222), name:"Bayswater (District, Circle)" } ,
  { point: new GLatLng(51.5402885352, 0.127400321155), name:"Becontree (District)" } ,
  { point: new GLatLng(51.5504266277, -0.164232306334), name:"Belsize Park (Northern)" } ,
  { point: new GLatLng(51.4979491196, -0.0636513509181), name:"Bermondsey (Jubilee)" } ,
@@ -372,6 +372,8 @@ polylines: [
   new GLatLng(51.4805297843, -0.194956844603),
   new GLatLng(51.48725695, -0.195540834374),
   new GLatLng(51.4918039079, -0.193545854059),
+  new GLatLng(51.5006734203, -0.192503135591)
+], [ '#149600', 0.2,
   new GLatLng(51.5006734203, -0.192503135591),
   new GLatLng(51.5090635336, -0.196537685408),
   new GLatLng(51.5122330587, -0.188038262222),
@@ -444,7 +446,7 @@ polylines: [
   new GLatLng(51.6574209719, -0.417280631946),
   new GLatLng(51.6470463381, -0.441710992609),
   new GLatLng(51.6297310905, -0.432666848604)
-], [ '#ff64a0', 0.5,
+], [ '#ff64a0', 0.2,
   new GLatLng(51.493497772, -0.224930071065),
   new GLatLng(51.5019521973, -0.226748329204),
   new GLatLng(51.5055608685, -0.226305459018),
@@ -453,9 +455,9 @@ polylines: [
   new GLatLng(51.5171884499, -0.210861917849),
   new GLatLng(51.5209208495, -0.200883771468),
   new GLatLng(51.5190171203, -0.188230043028),
-  new GLatLng(51.5153104158, -0.17539000601)
-], [ '#ff64a0', 0.9,
   new GLatLng(51.5153104158, -0.17539000601),
+  new GLatLng(51.519920474367346, -0.1676661307375839)
+], [ '#ff64a0', 0.9,
   new GLatLng(51.519920474367346, -0.1676661307375839),
   new GLatLng(51.5230612481, -0.156900356058),
   new GLatLng(51.5237203146, -0.143956086447),
@@ -477,10 +479,12 @@ polylines: [
   new GLatLng(51.5352333039, 0.0352731801292),
   new GLatLng(51.5389260365, 0.0514755488355),
   new GLatLng(51.5394512085, 0.0808631828494)
-], [ '#ffff00', 0.9,
+], [ '#ffff00', 0.2,
   new GLatLng(51.5153104158, -0.17539000601),
   new GLatLng(51.5122330587, -0.188038262222),
   new GLatLng(51.5090635336, -0.196537685408),
+  new GLatLng(51.5006734203, -0.192503135591)
+], [ '#ffff00', 0.9,
   new GLatLng(51.5006734203, -0.192503135591),
   new GLatLng(51.4942397839, -0.182989526483),
   new GLatLng(51.4939998728, -0.173922310884),
@@ -504,6 +508,8 @@ polylines: [
   new GLatLng(51.525561006, -0.135836140694),
   new GLatLng(51.5237203146, -0.143956086447),
   new GLatLng(51.5230612481, -0.156900356058),
+  new GLatLng(51.519920474367346, -0.1676661307375839)
+], [ '#ffff00', 0.2,
   new GLatLng(51.519920474367346, -0.1676661307375839),
   new GLatLng(51.5153104158, -0.17539000601)
 ], [ '#ff0000', 0.9,
