@@ -20,22 +20,22 @@ function load() {
 }
 
 var basePin = new GIcon();
-	basePin.shadow = "http://traintimes.org.uk:81/map/tube/i/pin_shadow.png";
+	basePin.shadow = "http://traintimes.org.uk/map/tube/i/pin_shadow.png";
 	basePin.iconSize = new GSize(12,20);
 	basePin.shadowSize = new GSize(22,20);
 	basePin.iconAnchor = new GPoint(6,20);
 	basePin.infoWindowAnchor = new GPoint(5,1);
 var trainPin = new GIcon(basePin);
-	trainPin.image = "http://traintimes.org.uk:81/map/tube/i/pin_yellow.png";
+	trainPin.image = "http://traintimes.org.uk/map/tube/i/pin_yellow.png";
 //	trainPin.image = "i/train.gif";
 //	trainPin.iconSize = new GSize(32, 28);
 //	trainPin.iconAnchor = new GPoint(16, 20);
 var stationPin = new GIcon(basePin);
-	stationPin.image = "http://traintimes.org.uk:81/map/tube/i/station.png";
+	stationPin.image = "http://traintimes.org.uk/map/tube/i/station.png";
     stationPin.iconSize = new GSize(20, 20);
     stationPin.iconAnchor = new GPoint(10, 20);
 var greenPin = new GIcon(basePin);
-	greenPin.image = "http://traintimes.org.uk:81/map/tube/i/pin_green.png";
+	greenPin.image = "http://traintimes.org.uk/map/tube/i/pin_green.png";
 
 function Train(train) {
 	this.inheritFrom = PdMarker;
@@ -269,7 +269,7 @@ Message = {
 		loading.style.display = 'block';
 	},
 	showWait : function() {
-		this._show('32px', '-16px', '<img src="http://traintimes.org.uk:81/map/tube/i/loading.gif" alt="Loading..." width="32" height="32">');
+		this._show('32px', '-16px', '<img src="http://traintimes.org.uk/map/tube/i/loading.gif" alt="Loading..." width="32" height="32">');
 	},
 	showText : function(text) {
 		setOpacity(document.getElementById('map'), 0.4);
