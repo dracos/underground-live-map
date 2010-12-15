@@ -9,9 +9,9 @@ body {
 	padding: 0;
 	margin: 10px 10px 0;
 }
-a:link { color: #0000ff; background-color: #ffffff; }
-a:visited { color: #000099; background-color: #ffffff; }
-a:active, a:hover { color: #ff0000; background-color: #ffffff; }
+a:link { color: #0000ff; }
+a:visited { color: #000099; }
+a:active, a:hover { color: #ff0000; }
 
 img {
 	border: 0;
