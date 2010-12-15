@@ -13,7 +13,7 @@ dir = '/srv/traintimes.org.uk/public/htdocs/map/tube/bin/'
 
 format = 'traintimes'
 
-api = 'http://apibeta.london.gov.uk/TrackernetWebServicev3/timetableService.aspx?Feed=4&Line=%s&StationCode=&Time='
+api = 'http://cloud.tfl.gov.uk/TrackerNet/PredictionSummary/%s'
 
 station_locations = json.load(open(dir + 'stations.json'))
 for name, str in station_locations.items():
@@ -37,6 +37,9 @@ lines = {
 def parse_time(s):
     """Converts time in MM:SS, or - for 0, to time in seconds"""
     if s == '-': return 0
+    m = re.match('(\d+):(\d+):(\d+)$', s)
+    if m:
+        return int(m.group(1))*3600 + int(m.group(2))*60 + int(m.group(3))
     m = re.match('(\d+):(\d+)$', s)
     return int(m.group(1))*60 + int(m.group(2))
 
@@ -79,6 +82,7 @@ for key, line in lines.items():
                     'current_location': current_location,
                     'time_to_station': time_to_station,
                     'dest_code': dest_code,
+                    'destination': destination,
                 }
                 if time_to_station < out.get(key, {}).get(set_id, {}).get('time_to_station', 999999):
                     out.setdefault(key, {})[set_id] = entry
@@ -211,7 +215,7 @@ if format=='traintimes':
                 'next': next,
                 'left': '',
                 'id': '%s-%s' % (line, id),
-                'title': lines[line] + ' train (' + id + ')',
+                'title': lines[line] + ' train to ' + arr['destination'] + ' [' + id + ']',
             })
     grr = json.dumps(outJ, indent=4)
     grr = re.sub('"(new GLatLng\([^)]*\))"', r'\1', grr)
