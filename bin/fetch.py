@@ -68,7 +68,7 @@ for key, line in lines.items():
                 #if 'Terminal 5' in station_name: continue # List doesn't have its location
                 if 'Road 21' in station_name: continue # List doesn't have its location
                 time_to_station = parse_time(time_to_station)
-                if set_id == '000':
+                if set_id == '000' or (set_id == '477' and key in ('N', 'V')):
                     lookup = re.sub('\s*Platform \d+$', '', current_location)
                     if current_location == 'At Platform':
                         lookup = 'At %s' % station_name
