@@ -115,6 +115,7 @@ stations: [
  { point: new GLatLng(51.4666141735, -0.423409349455), name:"Hatton Cross (Piccadilly)" } ,
  { point: new GPoint(-0.45210292724826395,51.47045415724583), name:"Heathrow Terminals 1, 2 &amp; 3" } ,
  { point: new GLatLng(51.4585531041, -0.446058766978), name:"Heathrow Terminal 4 (Piccadilly)" } ,
+ { point: new GLatLng(51.4723, -0.488), name:"Heathrow Terminal 5 (Piccadilly)" } ,
  { point: new GLatLng(51.5832938301, -0.226496207803), name:"Hendon Central (Northern)" } ,
  { point: new GLatLng(51.6506011706, -0.194751021948), name:"High Barnet (Northern)" } ,
  { point: new GLatLng(51.5006734203, -0.192503135591), name:"High Street Kensington (District, Circle)" } ,
@@ -623,6 +624,9 @@ polylines: [
   new GLatLng(51.4992764822, -0.314156832665),
   new GLatLng(51.5013679363, -0.307018839247),
   new GLatLng(51.502749773, -0.280251203536)
+], [ '#0000c8', 0.9,
+  new GPoint(-0.45210292724826395,51.47045415724583),
+  new GLatLng(51.4723, -0.488)
 ], [ '#808080', 0.9,
   new GLatLng(51.6196183368, -0.303108171359),
   new GLatLng(51.6077595152, -0.294653740878),

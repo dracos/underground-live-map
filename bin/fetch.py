@@ -65,7 +65,7 @@ for key, line in lines.items():
             trains = re.findall('<T S="(.*?)" T="(.*?)" D="(.*?)" C="(.*?)" L="(.*?)" DE="(.*?)" />', platform)
             for set_id, trip_id, dest_code, time_to_station, current_location, destination in trains:
                 if current_location == '': continue
-                if 'Terminal 5' in station_name: continue # List doesn't have its location
+                #if 'Terminal 5' in station_name: continue # List doesn't have its location
                 if 'Road 21' in station_name: continue # List doesn't have its location
                 time_to_station = parse_time(time_to_station)
                 if set_id == '000':
