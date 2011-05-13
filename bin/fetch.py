@@ -125,6 +125,7 @@ def canon_station_name(s, line):
         .replace('Picadilly Circus', 'Piccadilly Circus') \
         .replace("Queen's' Park", "Queen's Park") \
         .replace('High Barent', 'High Barnet') \
+        .replace('Highbury &amp; Isl ', 'Highbury &amp; Islington ') \
         .replace('Bartnet', 'Barnet') \
         .replace('Faringdon', 'Farringdon') \
         .replace('Turnham Greens', 'Turnham Green') \
@@ -132,10 +133,13 @@ def canon_station_name(s, line):
         .replace('Dagemham', 'Dagenham') \
         .replace('Edgware Road (H &amp; C)', 'Edgware Road Circle') \
         .replace('Hammersmith (Circle and H&amp;C)', 'Hammersmith') \
+        .replace('Hammersmith (C&amp;H)', 'Hammersmith') \
         .replace('Shepherds Bush (Central Line)', "Shepherd's Bush") \
         .replace('Terminals 123', 'Terminals 1, 2, 3').replace('Terminal 1,2,3', 'Terminals 1, 2, 3') \
         .replace('Woodford Junction', 'Woodford') \
         .replace("King's Cross Station", "King's Cross St. Pancras Station") \
+        .replace("Kings Cross St. P Station", "King's Cross St. Pancras Station") \
+        .replace("Kings Cross St. Pancras Station", "King's Cross St. Pancras Station") \
         .replace("Kings Cross Station", "King's Cross St. Pancras Station") \
         .replace('Central Finchley', 'Finchley Central').replace('District and Picc', 'D &amp; P') \
         .replace('South Fields', 'Southfields') \
@@ -143,6 +147,7 @@ def canon_station_name(s, line):
         .replace('Bromley-by-Bow', "Bromley-By-Bow") \
         .replace('Brent Oak', 'Burnt Oak') \
         .replace('St. Johns Wood', "St. John's Wood") \
+        .replace('St. John Wood', "St. John's Wood") \
         .replace('Totteridge and Whetstone', 'Totteridge &amp; Whetstone') \
         .replace('Newbury Park Loop', 'Newbury Park') \
         .replace('Harrow-on-the-Hill', 'Harrow on the Hill')
