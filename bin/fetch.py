@@ -1,4 +1,6 @@
 #!/usr/bin/python
+""" Create the file /data/london.js from the sources files within the /data folder.
+The client side code uses london.js for its static source data, e.g. geography of stations. """
 
 from __future__ import division 
 import urllib
@@ -8,8 +10,21 @@ import time
 import os
 import os.path
 import mx.DateTime
+import sys
 
-dir = '/srv/traintimes.org.uk/public/htdocs/map/tube/bin/'
+# get the current working directory, which is assumed to be the /bin directory within the project.
+dir = os.getcwd() + '/'
+print 'Data generation tool for underground-live-map\nUsage: python fetch.py\nMust be run from the bin folder within the project\n'
+print 'Creating and populating directories: \n%s and \n%s' % ( dir + 'cache', dir + '../data' ) 
+# Now create the destination directories relative to the cwd.
+try:
+    os.mkdir('cache')
+    os.mkdir('../data')
+except Exception as ex:
+    pass # ignore - probably exists already.
+
+# If the above approach doesn't work for you, you could hard code dir liek this:
+# dir = '/srv/traintimes.org.uk/public/htdocs/map/tube/bin/'
 
 format = 'traintimes'
 
