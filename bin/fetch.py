@@ -12,10 +12,25 @@ import os.path
 import mx.DateTime
 import sys
 
-# get the current working directory, which is assumed to be the /bin directory within the project.
+import argparse
+
+# Parse any command line arguments. Currently just --debug flag
+parser = argparse.ArgumentParser(description='Process some integers.')
+parser.add_argument('-debug','--debug',action="store_true", help='true for noisy helpful execution, false or omitted for quiet.')
+
+args = parser.parse_args()
+debug_mode = (args.debug)
+
+""" Print the string only if we're in debug mode. """
+def print_debug(out):
+    if debug_mode:
+        print out
+        
+# get the directory containing this file, fetch.py, which is in the /bin directory within the project.
 dir = os.getcwd() + '/'
-print 'Data generation tool for underground-live-map\nUsage: python fetch.py\nMust be run from the bin folder within the project\n'
-print 'Creating and populating directories: \n%s and \n%s' % ( dir + 'cache', dir + '../data' ) 
+dir = os.path.dirname(os.path.abspath(__file__) ) + '/'
+print_debug( 'Data generation tool for underground-live-map\nUsage: python fetch.py\n')
+print_debug( 'Creating and populating directories: \n%s and \n%s' % ( dir + 'cache', dir + '../data' )) 
 # Now create the destination directories relative to the cwd.
 try:
     os.mkdir('cache')
@@ -23,14 +38,14 @@ try:
 except Exception as ex:
     pass # ignore - probably exists already.
 
-# If the above approach doesn't work for you, you could hard code dir liek this:
+# If the above approach doesn't work for you, you could hard code dir like this:
 # dir = '/srv/traintimes.org.uk/public/htdocs/map/tube/bin/'
 
 format = 'traintimes'
 
 api = 'http://cloud.tfl.gov.uk/TrackerNet/PredictionSummary/%s'
 
-print "Processing stations.json"
+print_debug( "Processing stations.json")
 station_locations = json.load(open(dir + 'stations.json'))
 for name, str in station_locations.items():
     lng, lat = str.split(',')
@@ -106,7 +121,7 @@ for key, line in lines.items():
                 #print '%s %s %s | %s %s %s' % (key, station_name, platform_name, set_id, time_to_station, current_location)
 
 # Remove trains that have the same ID and dest_code, but a higher time_to_station - probably the same train
-print "Removing duplicate trains"
+print_debug( "Removing duplicate trains")
 for key, ids in out.items():
     for id, arr in ids.items():
         for key2, ids2 in out.items():
@@ -174,7 +189,7 @@ def canon_station_name(s, line):
         s = 'Edgware Road Circle Station'
     return s
 
-print "Processing stations"
+print_debug ("Processing stations")
 for line, ids in out.items():
     for id, arr in ids.items():
         if 'Sidings' in arr['current_location']: continue
@@ -207,7 +222,7 @@ for line, ids in out.items():
             # Don't know where we were previously, can't be bothered to work it out, needs to store history!
             arr['location'] = station_locations[canon_station_name(m.group(1), line)]
 
-print "Building trains and travel time data" 
+print_debug( "Building trains and travel time data") 
 ## MJA 16jun11 Could do with a better description of this    
 if format=='traintimes':
     outJ = {
@@ -255,3 +270,4 @@ if format=='traintimes':
     fp.close()
     os.rename(dir + '../data/london.jsN', dir + '../data/london.js')
 
+print_debug( "Done")
