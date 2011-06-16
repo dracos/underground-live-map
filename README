@@ -20,7 +20,9 @@ Issues
 Install
 -------
 To install:
-* Clone the repo, e.g. git clone --recursive https://github.com/dracos/underground-live-map.git
+* Create a local folder for the project and configure this as the root of your webserver
+* Create folders /map/tube/ inside the project root.
+* Pull the repo into the /map/tube folder, e.g. git pull --recursive https://github.com/dracos/underground-live-map.git
 * In terminal, cd to the bin folder. Then Run the script fetch.py to generate the data/london.js output file.
 
 Possible TODOs

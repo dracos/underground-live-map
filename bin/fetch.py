@@ -30,6 +30,7 @@ format = 'traintimes'
 
 api = 'http://cloud.tfl.gov.uk/TrackerNet/PredictionSummary/%s'
 
+print "Processing stations.json"
 station_locations = json.load(open(dir + 'stations.json'))
 for name, str in station_locations.items():
     lng, lat = str.split(',')
@@ -105,6 +106,7 @@ for key, line in lines.items():
                 #print '%s %s %s | %s %s %s' % (key, station_name, platform_name, set_id, time_to_station, current_location)
 
 # Remove trains that have the same ID and dest_code, but a higher time_to_station - probably the same train
+print "Removing duplicate trains"
 for key, ids in out.items():
     for id, arr in ids.items():
         for key2, ids2 in out.items():
@@ -172,6 +174,7 @@ def canon_station_name(s, line):
         s = 'Edgware Road Circle Station'
     return s
 
+print "Processing stations"
 for line, ids in out.items():
     for id, arr in ids.items():
         if 'Sidings' in arr['current_location']: continue
@@ -203,7 +206,9 @@ for line, ids in out.items():
         if m:
             # Don't know where we were previously, can't be bothered to work it out, needs to store history!
             arr['location'] = station_locations[canon_station_name(m.group(1), line)]
-   
+
+print "Building trains and travel time data" 
+## MJA 16jun11 Could do with a better description of this    
 if format=='traintimes':
     outJ = {
         'station': 'London Underground',
