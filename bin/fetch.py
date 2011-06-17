@@ -10,16 +10,15 @@ import time
 import os
 import os.path
 import mx.DateTime
-import sys
 
-import argparse
+import optparse
 
 # Parse any command line arguments. Currently just --debug flag
-parser = argparse.ArgumentParser(description='Process some integers.')
-parser.add_argument('-debug','--debug',action="store_true", help='true for noisy helpful execution, false or omitted for quiet.')
+parser = optparse.OptionParser()
+parser.add_option('-d', '--debug', action="store_true", help='true for noisy helpful execution, false or omitted for quiet.')
 
-args = parser.parse_args()
-debug_mode = (args.debug)
+(options, args) = parser.parse_args()
+debug_mode = options.debug
 
 """ Print the string only if we're in debug mode. """
 def print_debug(out):
@@ -35,7 +34,7 @@ print_debug( 'Creating and populating directories: \n%s and \n%s' % ( dir + 'cac
 try:
     os.mkdir('cache')
     os.mkdir('../data')
-except Exception as ex:
+except Exception, ex:
     pass # ignore - probably exists already.
 
 # If the above approach doesn't work for you, you could hard code dir like this:
