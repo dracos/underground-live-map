@@ -17,6 +17,14 @@ Issues
 * H&C stations between Paddington and Hammersmith are missing or empty
   in the source data from TfL.
 
+Install
+-------
+To install:
+* Create a local folder for the project and configure this as the root of your webserver
+* Create folders /map/tube/ inside the project root.
+* Pull the repo into the /map/tube folder, e.g. git pull --recursive https://github.com/dracos/underground-live-map.git
+* In terminal, cd to the bin folder. Then Run the script fetch.py to generate the data/london.js output file.
+
 Possible TODOs
 --------------
 * Fix the remaining stations that are misplaced, consolidate all
