@@ -4,12 +4,13 @@
  <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <title>Live map of London Underground trains</title>
-  <link href="http://traintimes.org.uk/map/tube/css.css" type="text/css" rel="stylesheet">
+  <link href="/map/tube/css.css" type="text/css" rel="stylesheet">
   <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAr0jEilTj74QAOSQ54V3GrxTwQSawC5yN9rAPq2diDIvxqz2lVRR6lF9P-tXKlfSvPmhASovImKIjbw" type="text/javascript"></script>
-  <script type="text/javascript" src="http://traintimes.org.uk/map/tube/js/pdmarker.js"></script>
-  <script type="text/javascript" src="http://traintimes.org.uk/map/tube/js/trains.js"></script>
+  <script type="text/javascript" src="/map/tube/js/pdmarker.js"></script>
+  <script type="text/javascript" src="/map/tube/js/trains.js"></script>
  </head>
  <body onunload="GUnload()">
+
   <h1>Live train map for the London Underground, by Matthew Somerville</h1>
 <noscript>
 <div style="border: solid 2px #cc0000; padding: 5px; width: 70%; margin: 1em auto;">
@@ -28,7 +29,9 @@ Matthew
 
 <p id="showhide"><a href="" onclick="Info.Hide(); return false;">Hide &raquo;</a>
 
-<div style="background-color: #ffff99; padding: 4px; margin-bottom: 1em;">
+<p><a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="dracos">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+
+<div style="margin-bottom: 1em;">
 <h2>What is this?</h2>
 <p>This map shows all trains (yellow pins) on the London Underground network
 in approximately real time (<a href="lu-screenshot.png">screenshot</a>).
@@ -42,29 +45,24 @@ and an awesome <a href="http://traintimes.org.uk/">bookmarkable train times jour
 the site in action</a> courtesy of Gary Gale. -->
 
 <h2>How does it work?</h2>
- <a href="http://opendatachallenge.org/"><img border="0" align="right" src="i/trophy.png" hspace="5" height="100" width="55" alt="2nd prize App in the Open Data Challenge"></a>
+ <a href="http://opendatachallenge.org/"><img border="0" align="right" src="/map/tube/i/trophy.png" hspace="5" height="100" width="55" alt="2nd prize App in the Open Data Challenge"></a>
 <p>Live departure data is fetched from the
-<a href="http://www.tfl.gov.uk/businessandpartners/syndication/16493.aspx">TfL API</a>,
-and then it does a bit of maths and magic. It&rsquo;s surprisingly okay, given this
-was done in only a few hours at <a href="http://sciencehackday.com/">Science Hackday</a>
-on 19/20th June 2010,
-and the many naming/location issues encountered, some
-unresolved. A small number of stations are misplaced or missing;
-occasional trains behave oddly; some H&amp;C and Circle stations are
+<a href="http://www.tfl.gov.uk/businessandpartners/syndication/"><abbr title="Transport for London">TfL</abbr> API</a>,
+and then it does a bit of maths and magic.
+A small number of stations are misplaced or missing;
+occasional trains behave oddly; some <abbr title="Hammersmith and City">H&amp;C</abbr> and Circle stations are
 missing in the TfL feed.</p>
 
 <h2>Who did this?</h2>
 <p><a href="http://twitter.com/dracos">Matthew Somerville</a>
 (with helpful hinderances from <a href="http://twitter.com/phae">Frances Berriman</a> and <a href="http://twitter.com/jaylett">James Aylett</a>).
 Station icon by <a href="http://red56.co.uk/">Tim Diggins</a>.
-<a href="http://github.com/dracos/underground-live-map">Source code</a>.
 </p>
 
 <p id="footer">
-Thanks TfL, and everyone involved in getting the API running again. Now how about it, National Rail?
-Open train data is good for everyone.</p>
+Originally built at <a href="http://sciencehackday.com/">Science Hackday</a>, June 2010.
+<a href="http://github.com/dracos/underground-live-map">Source code</a>.
 </p>
-
 
   </div>
   <script type="text/javascript"> load(); </script>
