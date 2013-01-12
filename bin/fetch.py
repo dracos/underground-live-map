@@ -71,6 +71,8 @@ def parse_time(s):
     if m:
         return int(m.group(1))*3600 + int(m.group(2))*60 + int(m.group(3))
     m = re.match('(\d+):(\d+)$', s)
+    if not m:
+        raise Exception, 'Did not match time %s' % s
     return int(m.group(1))*60 + int(m.group(2))
 
 # Loop through the trains
@@ -206,7 +208,7 @@ for line, ids in out.items():
         if m:
             location_1 = station_locations[canon_station_name(m.group(1), line)]
             location_2 = station_locations[station_name]
-            fraction = 30 / (time_to_station + 30)
+            fraction = 30 / (arr['time_to_station'] + 30)
             arr['location'] = (location_1[0] + (fraction*(location_2[0]-location_1[0])), location_1[1] + (fraction*(location_2[1]-location_1[1])))
         m = re.match('Between (.*?) and (.*)', arr['current_location'])
         if m:
@@ -214,8 +216,8 @@ for line, ids in out.items():
                 continue
             location_1 = station_locations[canon_station_name(m.group(1), line)]
             location_2 = station_locations[canon_station_name(m.group(2), line)]
-            max = time_to_station+30 if time_to_station > 150 else 180
-            fraction = (max-time_to_station) / max
+            max = arr['time_to_station']+30 if arr['time_to_station'] > 150 else 180
+            fraction = (max-arr['time_to_station']) / max
             arr['location'] = (location_1[0] + (fraction*(location_2[0]-location_1[0])), location_1[1] + (fraction*(location_2[1]-location_1[1])))
         m = re.match('Approaching (.*)', arr['current_location'])
         if m:
