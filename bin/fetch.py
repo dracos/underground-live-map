@@ -95,7 +95,6 @@ for key, line in lines.items():
             trains = re.findall('<T S="(.*?)" T="(.*?)" D="(.*?)" C="(.*?)" L="(.*?)" DE="(.*?)" />', platform)
             for set_id, trip_id, dest_code, time_to_station, current_location, destination in trains:
                 if current_location == '': continue
-                #if 'Terminal 5' in station_name: continue # List doesn't have its location
                 if 'Road 21' in station_name: continue # List doesn't have its location
                 time_to_station = parse_time(time_to_station)
                 if set_id == '000' or (set_id == '477' and key in ('N', 'V')):
@@ -150,6 +149,7 @@ def canon_station_name(s, line):
         .replace('Elephant and Castle', 'Elephant &amp; Castle') \
         .replace('Elephant Station', 'Elephant &amp; Castle Station') \
         .replace('Lambeth Station', 'Lambeth North Station') \
+        .replace('Castle and Lambeth North Station', 'Lambeth North Station') \
         .replace('Chalfont Station', 'Chalfont &amp; Latimer Station') \
         .replace('Chalfont and Latimer Station', 'Chalfont &amp; Latimer Station') \
         .replace('West Brompon', 'West Brompton') \
@@ -162,6 +162,7 @@ def canon_station_name(s, line):
         .replace('Turnham Greens', 'Turnham Green') \
         .replace('Ruilsip', 'Ruislip') \
         .replace('Dagemham', 'Dagenham') \
+        .replace('Paddington H &amp; C', 'Paddington') \
         .replace('Edgware Road (H &amp; C)', 'Edgware Road Circle') \
         .replace('Hammersmith (Circle and H&amp;C)', 'Hammersmith') \
         .replace('Hammersmith (C&amp;H)', 'Hammersmith') \
@@ -181,6 +182,8 @@ def canon_station_name(s, line):
         .replace('St. John Wood', "St. John's Wood") \
         .replace('Totteridge and Whetstone', 'Totteridge &amp; Whetstone') \
         .replace('Newbury Park Loop', 'Newbury Park') \
+        .replace('ALperton', 'Alperton') \
+        .replace('Moor park', 'Moor Park') \
         .replace('Harrow-on-the-Hill', 'Harrow on the Hill')
     if s == 'Edgware Road Station' and line == 'B':
         s = 'Edgware Road Bakerloo Station'
@@ -191,13 +194,11 @@ def canon_station_name(s, line):
 print_debug ("Processing stations")
 for line, ids in out.items():
     for id, arr in ids.items():
-        if 'Sidings' in arr['current_location']: continue
-        if 'North Acton Junction' in arr['current_location']: continue
-        if 'Terminal 5' in arr['current_location']: continue # List doesn't have its location
-        if 'Road 21' in arr['current_location']: continue # List doesn't have its location
-        if 'ALperton' in arr['current_location']: continue # List doesn't have its location
-        if 'Headstone Lane' in arr['current_location']: continue # List doesn't have its location
+        if 'Siding' in arr['current_location']: continue
         if 'Depot' in arr['current_location']: continue
+        if 'Network Rail Track' in arr['current_location']: continue
+        if 'North Acton Junction' in arr['current_location']: continue
+        if 'Road 21' in arr['current_location']: continue # List doesn't have its location
         station_name = canon_station_name(arr['station_name'], line)
         if arr['current_location'] == 'At Platform':
             arr['location'] = station_locations[station_name]
