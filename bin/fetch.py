@@ -229,11 +229,8 @@ print_debug( "Building trains and travel time data")
 if format=='traintimes':
     outJ = {
         'station': 'London Underground',
-        'center': 'new GLatLng(51.507, -0.143)',
         'lastupdate': mx.DateTime.ARPA.str(mx.DateTime.now()),
-        'span': 'new GLatLng(0.3, 0.9)',
         'trains': [],
-        'stations': [],
     }
     for line, ids in out.items():
         for id, arr in ids.items():
@@ -249,27 +246,26 @@ if format=='traintimes':
                 else:
                     mins_p = '%.1f' % mins
                 next.append({
-                    'point': 'new GLatLng(%s,%s)' % location,
+                    'point': [ location[0], location[1] ],
                     'name': stat,
                     'mins': mins,
                     'dexp': 'in %s minute%s' % (mins_p, '' if n['time_to_station']==60 else 's'),
                 })
             outJ['trains'].append({
-                'point': 'new GLatLng(%s,%s)' % arr['location'],
+                'point': [ arr['location'][0], arr['location'][1] ],
                 'next': next,
                 'left': '',
                 'id': '%s-%s' % (line, id),
                 'title': lines[line] + ' train to ' + arr['destination'] + ' [' + id + ']',
             })
     grr = json.dumps(outJ, indent=4)
-    grr = re.sub('"(new GLatLng\([^)]*\))"', r'\1', grr)
 
     stations = open(dir + 'london-stations-new2.js').read()
     grr = grr[:-2] + ',\n' + stations + '}' 
 
-    fp = open(dir + '../data/london.jsN', 'w')
+    fp = open(dir + '../data/london.jsonN', 'w')
     fp.write(grr)
     fp.close()
-    os.rename(dir + '../data/london.jsN', dir + '../data/london.js')
+    os.rename(dir + '../data/london.jsonN', dir + '../data/london.json')
 
 print_debug( "Done")

@@ -1,85 +1,97 @@
-/* v\:* {
-	behavior:url(#default#VML);
+html, body {
+    height: 100%;
 }
-*/
 body {
-	background-color: white;
-	color: black;
-	font-family: "Gill Sans MT", sans-serif;
-	padding: 0;
-	margin: 10px 10px 0;
+    background-color: white;
+    color: black;
+    font-family: "Gill Sans MT", sans-serif;
+    padding: 0;
+    margin: 0;
 }
 a:link { color: #0000ff; }
 a:visited { color: #000099; }
 a:active, a:hover { color: #ff0000; }
 
 img {
-	border: 0;
+    border: 0;
 }
 
 #map {
-	width: 500px;
-	height: 700px;
-	border: 1px solid #999999;
-	background-color: #e5e3df;
-	float: left;
+    width: 100%;
+    height: 100%;
+    background-color: #e5e3df;
 }
 
 #footer {
-	font-size: smaller;
-	border-top: dotted 1px #999999;
-	padding-top: 5px;
+    font-size: smaller;
+    border-top: dotted 1px #999999;
+    padding-top: 5px;
 }
 
 div.markerTooltip, div.markerDetail {
-	font-size: 83%;
-	color: black;
-	background-color: white;
-	white-space: nowrap;
-	margin: 0;
-	padding: 2px 4px;
-	border: 1px solid black;
+    font-size: 83%;
+    color: black;
+    background-color: white;
+    white-space: nowrap;
+    margin: 0;
+    padding: 2px 4px;
+    border: 1px solid black;
 }
 
 h1 {
-	font-size: 175%;
-	border-bottom: dotted 2px #cccccc;
-	margin: 0 0 0.5em 0;
+    color: #000;
+    background-color: #fff;
+    -webkit-box-shadow: 0px 0px 16px 2px #000;
+            box-shadow: 0px 0px 16px 2px #000;
+    -webkit-border-radius: 0 0.5em 0.5em 0;
+            border-radius: 0 0.5em 0.5em 0;
+    font-size: 175%;
+    position: absolute;
+    bottom: 1em; left: 0em;
+    padding: 0.25em 0.5em;
 }
 
 #info {
-	width: 250px;
-	float: right;
+    color: #000;
+    background-color: #fff;
+    -webkit-box-shadow: 0px 0px 8px 2px #000;
+            box-shadow: 0px 0px 8px 2px #000;
+    -webkit-border-radius: 0 0 0.5em 0.5em;
+            border-radius: 0 0 0.5em 0.5em;
+    position: absolute;
+    top: 0; right: 1em;
+    width: 16em;
+    padding: 0.5em;
 }
 #info #showhide {
-	float: right;
-	margin: 0;
+    float: right;
+    margin: 0;
 }
 #info h2 {
-	margin: 0;
+    margin: 0;
 }
 #info h3 {
-	margin-bottom: 0;
+    margin-bottom: 0;
 }
 #info p, #info ul {
-	margin-top: 0;
+    margin-top: 0;
 }
 #info ul {
-	margin-left: 1.5em;
-	padding-left: 0;
+    margin-left: 1.5em;
+    padding-left: 0;
 }
 
 #loading {
-	position: absolute;
-	top: 0; left: 0;
-	margin: 0 0 0 -16px;
-	text-align: center;
-	width: 32px;
-	color: black;
-	background-color: white;
-	font-size: 150%;
-	border: solid 1px #999999;
-	padding: 4px;
-	display: none;
-	line-height: 1;
+    position: absolute;
+    top: 50%; left: 50%;
+    margin: 0 0 0 -16px;
+    text-align: center;
+    width: 32px;
+    color: black;
+    background-color: white;
+    font-size: 150%;
+    border: solid 1px #999999;
+    padding: 4px;
+    display: none;
+    line-height: 1;
 }
