@@ -1,130 +1,96 @@
 var map = null;
-var stations = new Array();
-var trains = new Array();
+var trains = new L.LayerGroup([]);
 //var train_by_id = new Array();
 var starttime = new Date();
 var extra = 0;
 
 function load() {
-	if (GBrowserIsCompatible()) {
-		Update.mapSize();
-		GEvent.bindDom(window,"resize",this,this.Update.mapSize);
-		map = new GMap2(document.getElementById('map'), {
-            mapTypes: [
-                new GMapType(
-                    [ new GTileLayer(null, 10, 17, { tileUrlTemplate: '/map/tube/skyfall/black.png', isPng:true, opacity:1.0 }) ],
-                    G_NORMAL_MAP.getProjection(),
-                    'Black'
-                )
-            ]
-        });
-		map.addControl(new GSmallZoomControl());
-		map.setCenter(new GLatLng(51.507, -0.143), 12);
-		Update.mapStart();
-	}
+    map = L.map('map').setView([51.507, -0.120], 13);
+    L.tileLayer('/map/tube/skyfall/black.png', {
+        minZoom: 10,
+        maxZoom: 18
+    }).addTo(map);
+    trains.addTo(map);
+    Update.mapStart();
 }
 
-var basePin = new GIcon();
-	//basePin.shadow = "http://traintimes.org.uk/map/tube/i/pin_shadow.png";
-	//basePin.iconSize = new GSize(12,20);
-	//basePin.shadowSize = new GSize(22,20);
-	//basePin.iconAnchor = new GPoint(6,20);
-	basePin.infoWindowAnchor = new GPoint(5,1);
-var trainPin = new GIcon(basePin);
-	trainPin.image = "/map/tube/skyfall/dot.png";
-	trainPin.iconSize = new GSize(10, 10);
-	trainPin.iconAnchor = new GPoint(5, 5);
-var stationPin = new GIcon(basePin);
-	stationPin.image = "http://traintimes.org.uk/map/tube/i/station.png";
-    stationPin.iconSize = new GSize(20, 20);
-    stationPin.iconAnchor = new GPoint(10, 20);
-
-function Train(train) {
-	this.inheritFrom = PdMarker;
-    this.updateDetails(train);
-	this.info = '';
-	this.calculateLocation();
-	this.inheritFrom(this.point, trainPin);
-	this.createTitle();
-}
-Train.prototype = new PdMarker(new GLatLng(1,1), trainPin);
-Train.prototype.createTitle = function() {
-	var html = '';
-    html = this.train_id;
-	//html = this.title + '<br>' + this.info;
-	//if (this.string) html += '<br><em>'+this.string+'</em>'
-	if (html != this.getTooltip()) this.setTooltip(html);
-	//if (this.link) html += '<br><a href="'+this.link+'">View board</a>'
-	//this.setDetailWinHTML(html);
-};
-Train.prototype.updateDetails = function(train) {
-    this.train_id = train.id;
-	this.startPoint = train.point;
-	this.justLeft = train.left;
-	this.title = train.title;
-	this.string = train.string;
-	this.link = train.link
-	this.route = train.next;
-};
-Train.prototype.calculateLocation = function() {
-	var now = new Date();
-	var secs = (starttime - map.date)/1000 + extra + (now - starttime)/1000;
-	var point = 0;
-	var from = this.startPoint;
-	var from_name = this.justLeft;
-	for (r=0; r<this.route.length; r++) {
-		var stop = this.route[r];
-		if (secs < stop.mins*60) {
-			var dlat = stop.point.lat() - from.lat();
-			var dlng = stop.point.lng() - from.lng();
-			var new_lat = from.lat() + dlat/(stop.mins*60)*secs;
-			var new_lng = from.lng() + dlng/(stop.mins*60)*secs;
-			point = new GLatLng(new_lat, new_lng);
-			this.info = '(left '+from_name+',<br>expected '+stop.name;
-			if (stop.dexp) this.info += ' '+stop.dexp;
-			this.info += ')';
-			break;
-		}
-		secs -= stop.mins * 60;
-		from = stop.point;
-		from_name = stop.name;
-	}
-	if (!point) point = from;
-	this.point = point;
-};
-Train.prototype.recalculateLocation = function() {
-	this.calculateLocation();
-	this.setPoint(this.point)
-	this.createTitle();
-        this.showTooltip();
-}
-
-function Station(station) {
-	this.inMouseOver = false;
-	this.point = station.point;
-	this.name = station.name;
-	this.inheritFrom = PdMarker;
-	this.inheritFrom(station.point, stationPin);
-    /*
-	this.setTooltip(this.name);
-GEvent.addListener(this, 'mouseover', function() {
-        if (this.inMouseOver) return;
-        this.inMouseOver = true;
-        if (!this.detailOpen) this.showTooltip();
-        this.inMouseOver = false;
+var Station = L.Marker.extend({
+    initialize: function(station, options) {
+        L.Marker.prototype.initialize.call(this, station.point, options);
+        this.bindLabel(station.name);
+    },
+    options: {
+        icon: new L.Icon({
+            iconUrl: "http://traintimes.org.uk/map/tube/i/station.png",
+            iconSize: [ 20, 20 ],
+            iconAnchor: [ 10, 20 ],
+            labelAnchor: [ 4, -13 ]
+        })
+    }
 });
-GEvent.addListener(this, 'mouseout', function() {
-        if (!this.detailOpen) this.hideTooltip();
+
+var Train = L.Marker.extend({
+    initialize: function(train, options) {
+        L.Marker.prototype.initialize.call(this, train.point, options);
+        this.updateDetails(train);
+        this.info = '';
+        this.calculateLocation();
+        this.createTitle();
+    },
+    createTitle: function() {
+        var html = '';
+        html = this.train_id;
+        this.bindLabel(html, { noHide: true });
+    },
+    updateDetails: function(train) {
+        this.train_id = train.id;
+        this.startPoint = train.point;
+        this.justLeft = train.left;
+        this.title = train.title;
+        this.string = train.string;
+        this.link = train.link
+        this.route = train.next;
+    },
+    calculateLocation: function() {
+        var now = new Date();
+        var secs = (starttime - map.date)/1000 + extra + (now - starttime)/1000;
+        var point = 0;
+        var from = this.startPoint;
+        var from_name = this.justLeft;
+        for (r=0; r<this.route.length; r++) {
+            var stop = this.route[r];
+            if (secs < stop.mins*60) {
+                var dlat = stop.point[0] - from[0];
+                var dlng = stop.point[1] - from[1];
+                var new_lat = from[0] + dlat/(stop.mins*60)*secs;
+                var new_lng = from[1] + dlng/(stop.mins*60)*secs;
+                point = [ new_lat, new_lng ];
+                this.info = '(left '+from_name+',<br>expected '+stop.name;
+                if (stop.dexp) this.info += ' '+stop.dexp;
+                this.info += ')';
+                break;
+            }
+            secs -= stop.mins * 60;
+            from = stop.point;
+            from_name = stop.name;
+        }
+        if (!point) point = from;
+        this.point = point;
+        this.setLatLng(this.point)
+    },
+    options: {
+        icon: new L.Icon({
+            labelAnchor: [ -5, 5 ],
+            iconUrl: "/map/tube/skyfall/dot.png",
+            iconSize: [ 10, 10 ],
+            iconAnchor: [ 5, 5 ],
+            popupAnchor: [ 5, 1 ]
+        })
+    }
 });
-*/
-	GEvent.addListener(this, 'click', function() {
-		this.showMapBlowup(15);
-	});
-}
-Station.prototype = new PdMarker(new GLatLng(1,1), stationPin);
 
 // Updates from server, site, and periodically
- Update = {
+Update = {
     mapStart: function() {
         Update.map(true);
     },
@@ -132,202 +98,124 @@ Station.prototype = new PdMarker(new GLatLng(1,1), stationPin);
         Update.map(false);
     },
     map: function(refresh) {
-	var name = 'london';
-	Message.showWait();
-	GDownloadUrl('/map/tube/data/'+name+'.js', function(data, status) {
-		if (status != 200 && status != 304) {
-			Message.showText('Data could not be fetched');
-			if (!map.isLoaded())
-		        map.setCenter(new GLatLng(51.507, -0.143), 12);
-			return;
-		}
-		var data = eval("(" + data + ")");
-		var date = data.lastupdate;
-		document.getElementById('update').innerHTML = date;
-		map.date = new Date(date);
+        var name = 'london';
+        Message.showWait();
+        reqwest({
+            url: '/map/tube/data/'+name+'.json',
+            type: 'json',
+            error: function(err) {
+                Message.showText('Data could not be fetched');
+            },
+            success: function(data) {
+                var date = data.lastupdate;
+                document.getElementById('update').innerHTML = date;
+                map.date = new Date(date);
+                var markers;
+                if (refresh) {
+                    var lines = data.polylines;
+                    for (l=0; lines && l<lines.length; l++) {
+                        var line = lines[l];
+                        var colour = line.shift();
+                        colour = '#cc0000';
+                        var opac = line.shift();
+                        if (!line.length) continue;
+                        L.polyline( line, { color: colour, weight: 4, opacity: opac } ).addTo(map);
+                    }
 
-        var markers;
-		// Centre and zoom map, only the first time
-		if (refresh) {
-		    map.clearOverlays();
-		    trains = [];
-			var center = data.center;
-			var span = data.span;
-			var center_lng = center.lng();
-		 	var center_lat = center.lat();
-			var span_lng = span.lng();
-			var span_lat = span.lat();
-			var zoom = 10;
-			if (span_lng && span_lat) {
-				var sw = new GLatLng(center_lat-span_lat/2, center_lng-span_lng/2);
-				var ne = new GLatLng(center_lat+span_lat/2, center_lng+0+span_lng/2);
-				var zoom = map.getBoundsZoomLevel(new GLatLngBounds(sw, ne)) + 3;
-			}
-			map.setCenter(center, zoom);
+                    markers = data.stations;
+                    if (data.trains) markers = markers.concat(data.trains);
 
-		    var lines = data.polylines
-		    for (l=0; lines && l<lines.length; l++) {
-			    var line = lines[l];
-                var colour = line.shift();
-                colour = '#cc0000';
-                var opac = line.shift();
-			    if (!line.length) continue;
-			    var polyline = new GPolyline(line, colour, 4, opac);
-			    map.addOverlay(polyline);
-		    }
+                } else {
+                    trains.clearLayers();
+                    markers = data.trains;
+                }
 
-		    markers = []; //data.stations;
-		    if (data.trains) markers = markers.concat(data.trains);
+                window.setTimeout(Update.mapSubsequent, 1000*60*2);
 
-        } else {
-	        for (i=0; i<trains.length; i++) {
-		        var train = trains[i];
-		        map.removeOverlay(train);
-	        }
-            trains = [];
-		    markers = data.trains;
-        }
-
-		var pos = 0;
-		window.setTimeout(plotMarkers, 165);
-		window.setTimeout(Update.mapSubsequent, 1000*60*2);
-        if (refresh) window.setTimeout(Update.trains, 200);
-
-		function plotMarkers() {
-			if (markers && pos < markers.length) {
-				var max = Math.min(pos+10, markers.length);
-				while (pos < max) {
-					if (markers[pos].name) { // Station
-						//var station = new Station(markers[pos]);
-						//map.addOverlay(station);
-						//stations[stations.length] = station;
-					} else if (markers[pos].title) { // Train
+                for (pos=0; markers && pos<markers.length; pos++) {
+                    if (markers[pos].name) { // Station
+                    } else if (markers[pos].title) { // Train
                         //var train_id = markers[pos].id;
                         //if (train_by_id[train_id]) {
-						//    train = train_by_id[train_id];
+                                                //    train = train_by_id[train_id];
                         //    train.updateDetails(markers[pos]);
                         //} else {
-						var train = new Train(markers[pos]);
-						map.addOverlay(train);
-                                                train.showTooltip();
-						trains[trains.length] = train;
+                        var t = new Train(markers[pos]);
+                        trains.addLayer( t );
+                        t.showLabel();
                         //    train_by_id[train_id] = train;
                         //}
-					}
-					pos++;
-				}
-				window.setTimeout(plotMarkers, 165);
-			} else {
-				Message.hideBox();
-                //if (refresh) window.setTimeout(Update.trains, 200);
-			}
-		}
-
-	});
+                    }
+                }
+                Message.hideBox();
+                if (refresh) window.setTimeout(Update.trains, 200);
+            }
+        });
     },
     trains : function() {
-	for (i=0; i<trains.length; i++) {
-		var train = trains[i];
-		train.recalculateLocation();
-	}
-	window.setTimeout(Update.trains, 200);
+        trains.eachLayer( function(train) {
+            train.calculateLocation();
+        });
+        window.setTimeout(Update.trains, 200);
+    }
+};
+
+Info = {
+    HiddenText : '<p id="showhide"><a href="" onclick="Info.Show(); return false;">More information &darr;</a></p>',
+    Hide : function() {
+        var i = document.getElementById('info');
+        this.content = i.innerHTML;
+        i.innerHTML = this.HiddenText;
+        i.style.width = 'auto';
     },
-    mapSize: function() {
-	var m = document.getElementById('map');
-	var i = document.getElementById('info');
-	var a=getWindowSize();
-	var b=kb(m);
-	var c=a.height-b.y-10;
-	var d=a.width-Info.Width;
-    if (Info.Width > 48) d = d - 48;
-    else d = d - 36;
-	m.style.height=c+'px';
-	m.style.width=d+'px';
-	i.style.width = Info.Width + 'px';
-	i.style.height=c+'px';
-	var l = document.getElementById('loading').style;
-	l.top = (b.y+c/4) + 'px';
-	l.left = (b.x+d/2) + 'px';
+    Show : function() {
+        var i = document.getElementById('info');
+        i.innerHTML = this.content;
+        i.style.width = '16em';
     }
 };
 
 
-Info = {
-	Width : 250,
-	HiddenText : '<p id="showhide"><a href="" onclick="Info.Show(); return false;">&laquo;</a></p>',
-	Hide : function() {
-		var i = document.getElementById('info');
-		this.content = i.innerHTML;
-		i.innerHTML = this.HiddenText;
-		this.Width = 10;
-		Update.mapSize();
-	},
-	Show : function() {
-		var i = document.getElementById('info');
-		i.innerHTML = this.content;
-		this.Width = 250;
-		Update.mapSize();
-	}
-};
-
-
 Message = {
-	_show : function(width, marginLeft, text) {
-		var loading = document.getElementById('loading');
-		loading.style.width = width;
-		loading.style.marginLeft = marginLeft;
-		loading.innerHTML = text;
-		loading.style.display = 'block';
-	},
-	showWait : function() {
-		this._show('32px', '-16px', '<img src="http://traintimes.org.uk/map/tube/i/loading.gif" alt="Loading..." width="32" height="32">');
-	},
-	showText : function(text) {
-		setOpacity(document.getElementById('map'), 0.4);
-		this._show('30%', '-15%', text);
-	},
-	hideBox : function() {
-		document.getElementById('loading').style.display = 'none';
-	}
+    _show : function(width, marginLeft, text) {
+        var loading = document.getElementById('loading');
+        loading.style.width = width;
+        loading.style.marginLeft = marginLeft;
+        loading.innerHTML = text;
+        loading.style.display = 'block';
+    },
+    showWait : function() {
+        this._show('32px', '-16px', '<img src="http://traintimes.org.uk/map/tube/i/loading.gif" alt="Loading..." width="32" height="32">');
+    },
+    showText : function(text) {
+        setOpacity(document.getElementById('map'), 0.4);
+        this._show('30%', '-15%', text);
+    },
+    hideBox : function() {
+        document.getElementById('loading').style.display = 'none';
+    }
 };
 
 /* Useful global functions */
 
 function setOpacity(m, o) {
-	m = m.style;
-	if (typeof m.filter == 'string')
-		m.filter = 'alpha(opacity='+(o*100)+')';
-	else {
-		m.opacity = o;
-		m['-moz-opacity'] = o;
-		m['-khtml-opacity'] = o;
-	}
+    m = m.style;
+    if (typeof m.filter == 'string')
+        m.filter = 'alpha(opacity='+(o*100)+')';
+    else {
+        m.opacity = o;
+        m['-moz-opacity'] = o;
+        m['-khtml-opacity'] = o;
+    }
 }
 
-function kb(a){
-	var b={"x":0,"y":0};
-	while(a){
-		b.x+=a.offsetLeft;
-		b.y+=a.offsetTop;
-		a=a.offsetParent;
-	}
-	return b
-}
-
-function getWindowSize(){
-	a=new GSize(0,0);
-	if(window.self&&self.innerWidth){
-		a.width=self.innerWidth;
-		a.height=self.innerHeight;
-		return a;
-	}
-	if(document.documentElement&&document.documentElement.clientHeight){
-		a.width=document.documentElement.clientWidth;
-		a.height=document.documentElement.clientHeight;
-		return a;
-	}
-	a.width=document.body.clientWidth;
-	a.height=document.body.clientHeight;
-	return a;
+function kb(a) {
+    var b = { "x": 0, "y": 0 };
+    while (a) {
+        b.x += a.offsetLeft;
+        b.y += a.offsetTop;
+        a = a.offsetParent;
+    }
+    return b
 }
 

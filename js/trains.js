@@ -65,6 +65,7 @@ var Train = L.CircleMarker.extend({
         });
     },
     updateDetails: function(train) {
+        this.train_id = train.id;
         this.startPoint = train.point;
         this.justLeft = train.left;
         this.title = train.title;

@@ -1,22 +1,28 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
-  "http://www.w3.org/TR/html4/strict.dtd">
-<html xmlns:v="urn:schemas-microsoft-com:vml">
+<!DOCTYPE html>
+<html>
  <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta charset="utf-8">
   <title>Live map of London Underground trains</title>
-  <link href="/map/tube/skyfall/css.css" type="text/css" rel="stylesheet">
-  <script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=ABQIAAAAr0jEilTj74QAOSQ54V3GrxTwQSawC5yN9rAPq2diDIvxqz2lVRR6lF9P-tXKlfSvPmhASovImKIjbw" type="text/javascript"></script>
-  <script type="text/javascript" src="/map/tube/js/pdmarker.js"></script>
-  <script type="text/javascript" src="/map/tube/skyfall/trains.js"></script>
+  <link rel="stylesheet" href="/map/tube/lib/leaflet.css">
+  <!--[if lte IE 8]>
+    <link rel="stylesheet" href="/map/tube/lib/leaflet.ie.css">
+  <![endif]-->
+  <link rel="stylesheet" href="/map/tube/lib/leaflet.label.css">
+  <link rel="stylesheet" href="/map/tube/skyfall/css.css">
+  <script src="/map/tube/lib/leaflet.js"></script>
+  <script src="/map/tube/lib/leaflet.label.js"></script>
+  <script src="/map/tube/lib/reqwest.min.js"></script>
+  <script src="/map/tube/skyfall/trains.js"></script>
  </head>
- <body onunload="GUnload()">
- <!-- <div style="padding: 0.5em; text-align: center; font-weight: bold; z-index: 2000; background-color: #ff9900; color: black; position: absolute; width: 10em; top: 40%; left: 50%; margin-left: -5em"><em>Error in TfL feed</em><br>No data available</div> -->
+ <body>
+
+  <div id="map"><div style="padding: 1em; color: gray;">Loading...</div></div>
 
   <h1>Live train map for the London Underground, by Matthew Somerville</h1>
 <noscript>
 <div style="border: solid 2px #cc0000; padding: 5px; width: 70%; margin: 1em auto;">
-I'm afraid that this page requires JavaScript to interface with Google Maps
-and the data to plot and move the trains, which isn't possible with just HTML.
+I'm afraid that this page requires JavaScript to draw the maps and plot
+move the trains, which isn't possible with just HTML.
 However, all the data used to generate the map is accessible and available from
 <a href="http://www.tfl.gov.uk/">Transport for London's website</a>. &mdash;
 Matthew
@@ -24,11 +30,10 @@ Matthew
 </noscript>
   <p style="margin-bottom:0">
    <small>Data collected: <span id="update">No data yet</span></small></p>
-  <div id="map"><div style="padding: 1em; color: gray;">Loading...</div></div>
   <div id="loading"></div>
   <div id="info">
 
-<p id="showhide"><a href="" onclick="Info.Hide(); return false;">Hide &raquo;</a>
+<p id="showhide"><a href="" onclick="Info.Hide(); return false;">Hide &uarr;</a>
 
 <p><a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="dracos">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
 
