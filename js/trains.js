@@ -153,7 +153,7 @@ Update = {
 
                 window.setTimeout(Update.mapSubsequent, 1000*60*2);
 
-                for (pos=0; markers && pos<markers.length; pos++) {
+                for (var pos=0; markers && pos<markers.length; pos++) {
                     if (markers[pos].name) { // Station
                         new Station(markers[pos]).addTo(map);
                     } else if (markers[pos].title) { // Train
