@@ -168,7 +168,7 @@ Update = {
                     }
                 }
                 Message.hideBox();
-                if (refresh) window.setTimeout(Update.trains, 1000);
+                if (refresh) window.setTimeout(Update.trains, 200);
             }
         });
     },
@@ -176,7 +176,7 @@ Update = {
         trains.eachLayer( function(train) {
             train.calculateLocation();
         });
-        window.setTimeout(Update.trains, 1000);
+        window.setTimeout(Update.trains, 200);
     }
 };
 
