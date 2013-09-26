@@ -99,35 +99,37 @@ for key, line in lines.items():
                 if current_location == '': continue
                 if 'Road 21' in station_name: continue # List doesn't have its location
                 time_to_station = parse_time(time_to_station)
-                if set_id == '000' or (set_id == '477' and key in ('N', 'V')):
+                train_key = set_id
+                train_key += '-%s' % dest_code
+                if set_id in ('000', '477') or destination == 'Unknown' or dest_code == '0':
+                #or (set_id in ('015', '062', '113', '124') and key == 'N'):
                     lookup = re.sub('\s*Platform \d+$', '', current_location)
                     if current_location == 'At Platform':
                         lookup = 'At %s' % station_name
                     if not sub_ids.get(lookup):
                         sub_ids[lookup] = sub_id
                         sub_id += 1
-                    set_id += '-%s' % sub_ids[lookup]
+                    train_key += '-%s' % sub_ids[lookup]
                 entry = {
                     'station_name': re.sub('\.$', '', station_name),
                     'platform_name': platform_name,
                     'current_location': current_location,
                     'time_to_station': time_to_station,
-                    'dest_code': dest_code,
                     'destination': destination,
                 }
-                if time_to_station < out.get(key, {}).get(set_id, {}).get('time_to_station', 999999):
-                    out.setdefault(key, {})[set_id] = entry
-                outNext.setdefault(key, {}).setdefault(set_id, []).append(entry)
+                if time_to_station < out.get(key, {}).get(train_key, {}).get('time_to_station', 999999):
+                    out.setdefault(key, {})[train_key] = entry
+                outNext.setdefault(key, {}).setdefault(train_key, []).append(entry)
                 #print '%s %s %s | %s %s %s' % (key, station_name, platform_name, set_id, time_to_station, current_location)
 
-# Remove trains that have the same ID and dest_code, but a higher time_to_station - probably the same train
+# Remove trains that have the same ID, but a higher time_to_station - probably the same train
 print_debug( "Removing duplicate trains")
 for key, ids in out.items():
     for id, arr in ids.items():
         for key2, ids2 in out.items():
             if key == key2: continue
             for id2, arr2 in ids2.items():
-                if id == id2 and arr['dest_code'] == arr2['dest_code']:
+                if id == id2:
                     if arr['time_to_station'] < arr2['time_to_station']:
                         if out[key].get(id2): del out[key2][id2]
                     else:
