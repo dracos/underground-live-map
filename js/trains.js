@@ -1,11 +1,15 @@
 var map = null;
 var trains = new L.LayerGroup([]);
+var stations = new L.FeatureGroup([]);
 //var train_by_id = new Array();
 var starttime = new Date();
 var extra = 0;
 
 function load() {
-    map = L.map('map').setView([51.507, -0.120], 13);
+    map = L.map('map', {
+        attributionControl: false
+    }).setView([51.507, -0.120], 13);
+    L.control.attribution({ position: 'topleft' }).addTo(map);
     L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: 'Map data by <a href="http://openstreetmap.org">OpenStreetMap</a>.',
     //L.tileLayer('http://{s}.tile.stamen.com/toner/{z}/{x}/{y}.png', {
@@ -14,6 +18,7 @@ function load() {
         maxZoom: 18
     }).addTo(map);
     trains.addTo(map);
+    stations.addTo(map);
     Update.mapStart();
 }
 
@@ -87,7 +92,9 @@ var Train = L.CircleMarker.extend({
                 var new_lat = from[0] + dlat/(stop.mins*60)*secs;
                 var new_lng = from[1] + dlng/(stop.mins*60)*secs;
                 point = [ new_lat, new_lng ];
-                this.info = '(left '+from_name+',<br>expected '+stop.name;
+                this.info = '';
+                if (from_name) this.info += '(left '+from_name+',<br>';
+                this.info += 'expected ' + stop.name;
                 if (stop.dexp) this.info += ' '+stop.dexp;
                 this.info += ')';
                 break;
@@ -151,11 +158,14 @@ Update = {
                     markers = data.trains;
                 }
 
-                window.setTimeout(Update.mapSubsequent, 1000*60*2);
+                if (Update.refreshDataTimeout) {
+                    window.clearTimeout(Update.refreshDataTimeout);
+                }
+                Update.refreshDataTimeout = window.setTimeout(Update.mapSubsequent, 1000*60*2);
 
                 for (var pos=0; markers && pos<markers.length; pos++) {
                     if (markers[pos].name) { // Station
-                        new Station(markers[pos]).addTo(map);
+                        stations.addLayer( new Station(markers[pos]) );
                     } else if (markers[pos].title) { // Train
                         //var train_id = markers[pos].id;
                         //if (train_by_id[train_id]) {
@@ -167,8 +177,10 @@ Update = {
                         //}
                     }
                 }
+                if (refresh) {
+                    window.setTimeout(Update.trains, 200);
+                }
                 Message.hideBox();
-                if (refresh) window.setTimeout(Update.trains, 200);
             }
         });
     },
@@ -181,17 +193,17 @@ Update = {
 };
 
 Info = {
-    HiddenText : '<p id="showhide"><a href="" onclick="Info.Show(); return false;">More information &darr;</a></p>',
     Hide : function() {
         var i = document.getElementById('info');
-        this.content = i.innerHTML;
-        i.innerHTML = this.HiddenText;
         i.style.width = 'auto';
+        document.getElementById('info_show').style.display = 'block';
+        document.getElementById('info_shown').style.display = 'none';
     },
     Show : function() {
         var i = document.getElementById('info');
-        i.innerHTML = this.content;
         i.style.width = '16em';
+        document.getElementById('info_show').style.display = 'none';
+        document.getElementById('info_shown').style.display = 'block';
     }
 };
 
