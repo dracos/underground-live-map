@@ -57,6 +57,7 @@ var Train = L.CircleMarker.extend({
         });
         this.updateDetails(train);
         this.info = '';
+        this.angle = 0;
         this.calculateLocation();
     },
     createTitle: function() {
@@ -105,8 +106,46 @@ var Train = L.CircleMarker.extend({
         }
         if (!point) point = from;
         this.point = point;
+        var current = this.getLatLng();
+        if (current) {
+            var dx = this.point[1] - current.lng,
+                dy = this.point[0] - current.lat,
+                bearing = Math.atan2(dx, dy);
+            this.angle = bearing;
+        }
         this.setLatLng(this.point)
         this.createTitle();
+    },
+    getPathString: function () {
+        var p = this._point,
+            r = this._radius;
+
+        if (this._checkIfEmpty()) {
+            return '';
+        }
+
+        if (L.Browser.svg) {
+            var rad1 = this.angle-Math.PI/4,
+                rad2 = this.angle,
+                rad3 = this.angle+Math.PI/4,
+                rcostheta1 = r * Math.cos(rad1),
+                rsintheta1 = r * Math.sin(rad1),
+                rcostheta2 = r * Math.cos(rad2),
+                rsintheta2 = r * Math.sin(rad2),
+                rcostheta3 = r * Math.cos(rad3),
+                rsintheta3 = r * Math.sin(rad3);
+            return 'M' + p.x + ',' + (p.y - r) +
+                   'A' + r + ',' + r + ',0,1,1,' +
+                   (p.x - 0.1) + ',' + (p.y - r) +
+                   'M' + (p.x + rsintheta1/4) + ',' + (p.y - rcostheta1/4) +
+                   'L' + (p.x + rsintheta2/2) + ',' + (p.y - rcostheta2/2) +
+                   'L' + (p.x + rsintheta3/4) + ',' + (p.y - rcostheta3/4) +
+                   ' z';
+        } else {
+            p._round();
+            r = Math.round(r);
+            return 'AL ' + p.x + ',' + p.y + ' ' + r + ',' + r + ' 0,' + (65535 * 360);
+        }
     },
     options: {
         icon: new baseIcon({
