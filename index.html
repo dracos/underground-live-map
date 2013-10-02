@@ -4,16 +4,25 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Live map of London Underground trains</title>
-  <link rel="stylesheet" href="lib/leaflet.css">
+  <link rel="stylesheet" href="/map/tube/lib/leaflet.css">
   <!--[if lte IE 8]>
-    <link rel="stylesheet" href="lib/leaflet.ie.css">
+    <link rel="stylesheet" href="/map/tube/lib/leaflet.ie.css">
   <![endif]-->
-  <link rel="stylesheet" href="lib/leaflet.label.css">
-  <link rel="stylesheet" href="css.css">
-  <script src="lib/leaflet.js"></script>
-  <script src="lib/leaflet.label.js"></script>
-  <script src="lib/reqwest.min.js"></script>
-  <script src="js/trains.js"></script>
+  <link rel="stylesheet" href="/map/tube/lib/leaflet.label.css">
+  <link rel="stylesheet" href="/map/tube/css.css">
+  <script src="/map/tube/lib/leaflet.js"></script>
+  <script src="/map/tube/lib/leaflet.label.js"></script>
+  <script src="/map/tube/lib/reqwest.min.js"></script>
+  <script>
+    var TrainTimes = {
+      url: '/map/tube/',
+      centre: [51.507, -0.120],
+      fit_bounds: false,
+      station_icon: true,
+      train_colour: '#ff0'
+    };
+  </script>
+  <script src="/map/tube/js/trains.js"></script>
  </head>
  <body>
 

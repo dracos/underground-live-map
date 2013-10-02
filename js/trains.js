@@ -5,15 +5,40 @@ var stations = new L.FeatureGroup([]);
 var starttime = new Date();
 var extra = 0;
 
+function read_hash() {
+    var query = window.location.search.substring(1);
+    if (!query) {
+        query = window.location.hash.replace('#', '');
+    }
+    if (query) {
+        var dropdown = document.getElementById('line');
+        if (dropdown && dropdown.options) {
+            for (s=0; s<dropdown.options.length; s++) {
+                if (dropdown.options[s].value == query) {
+                    dropdown.selectedIndex = s;
+                    break;
+                }
+            }
+        } else if (dropdown) {
+            dropdown.value = query;
+        }
+    }
+    return query;
+}
+
 function load() {
+    var query = read_hash();
+
     map = L.map('map', {
         attributionControl: false
-    }).setView([51.507, -0.120], 13);
+    }).setView(TrainTimes.centre, 13);
     L.control.attribution({ position: 'topleft' }).addTo(map);
-    L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    var tile_url = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+    if (query == 'transport') {
+        tile_url = 'http://{s}.tile2.opencyclemap.org/transport/{z}/{x}/{y}.png';
+    }
+    L.tileLayer(tile_url, {
         attribution: 'Map data by <a href="http://openstreetmap.org">OpenStreetMap</a>.',
-    //L.tileLayer('http://{s}.tile.stamen.com/toner/{z}/{x}/{y}.png', {
-    //    attribution: 'Map data by <a href="http://openstreetmap.org">OpenStreetMap</a>. Tiles by <a href="http://stamen.com/">Stamen Design</a>.',
         minZoom: 10,
         maxZoom: 18
     }).addTo(map);
@@ -22,28 +47,44 @@ function load() {
     Update.mapStart();
 }
 
-var baseIcon = L.Icon.extend({
-    options: {
-        shadowUrl: "http://traintimes.org.uk/map/tube/i/pin_shadow.png",
-        shadowSize: [ 22, 20 ],
-        shadowAnchor: [ 6, 20 ]
-    }
-});
-
-var Station = L.Marker.extend({
-    initialize: function(station, options) {
-        L.Marker.prototype.initialize.call(this, station.point, options);
-        this.bindLabel(station.name);
-    },
-    options: {
-        icon: new baseIcon({
-            iconUrl: "http://traintimes.org.uk/map/tube/i/station.png",
-            iconSize: [ 20, 20 ],
-            iconAnchor: [ 10, 20 ],
-            labelAnchor: [ 4, -13 ]
-        })
-    }
-});
+var Station;
+if (TrainTimes.station_icon) {
+    var baseIcon = L.Icon.extend({
+        options: {
+            shadowUrl: "http://traintimes.org.uk/map/tube/i/pin_shadow.png",
+            shadowSize: [ 22, 20 ],
+            shadowAnchor: [ 6, 20 ]
+        }
+    });
+    Station = L.Marker.extend({
+        initialize: function(station, options) {
+            L.Marker.prototype.initialize.call(this, station.point, options);
+            this.bindLabel(station.name);
+        },
+        options: {
+            icon: new baseIcon({
+                iconUrl: "http://traintimes.org.uk/map/tube/i/station.png",
+                iconSize: [ 20, 20 ],
+                iconAnchor: [ 10, 20 ],
+                labelAnchor: [ 4, -13 ]
+            })
+        }
+    });
+} else {
+    Station = L.CircleMarker.extend({
+        initialize: function(station, options) {
+            L.CircleMarker.prototype.initialize.call(this, station.point, {
+                weight: 2,
+                color: '#000',
+                opacity: 1,
+                radius: 4,
+                fillColor: '#ff0',
+                fillOpacity: 1
+            });
+            this.bindLabel(station.name);
+        }
+    });
+}
 
 var Train = L.CircleMarker.extend({
     initialize: function(train, options) {
@@ -52,7 +93,7 @@ var Train = L.CircleMarker.extend({
             color: '#000',
             opacity: 1,
             radius: 5,
-            fillColor: '#ff0',
+            fillColor: TrainTimes.train_colour,
             fillOpacity: 1
         });
         this.updateDetails(train);
@@ -146,14 +187,6 @@ var Train = L.CircleMarker.extend({
             r = Math.round(r);
             return 'AL ' + p.x + ',' + p.y + ' ' + r + ',' + r + ' 0,' + (65535 * 360);
         }
-    },
-    options: {
-        icon: new baseIcon({
-            iconUrl: "http://traintimes.org.uk/map/tube/i/pin_yellow.png",
-            iconSize: [ 12, 20 ],
-            iconAnchor: [ 6, 20 ],
-            popupAnchor: [ 5, 1 ]
-        })
     }
 });
 
@@ -166,17 +199,36 @@ Update = {
         Update.map(false);
     },
     map: function(refresh) {
-        var name = 'london';
+        var dropdown = document.getElementById('line'),
+            name, url;
+        if (dropdown) {
+            if (dropdown.options) {
+                name = dropdown.options[dropdown.selectedIndex].value;
+            } else {
+                name = dropdown.value;
+            }
+            url = 'http://www.traintimes.org.uk/map/london-buses/#' + name;
+            document.getElementById('permalink').href = url;
+            window.location.hash = name;
+        } else {
+            name = 'london.json';
+        }
         Message.showWait();
         reqwest({
-            url: '/map/tube/data/'+name+'.json',
+            url: TrainTimes.url + 'data/' + encodeURIComponent(name),
             type: 'json',
             error: function(err) {
                 Message.showText('Data could not be fetched');
             },
             success: function(data) {
+                if (!data.stations.length && !data.trains.length) {
+                    Message.showText('No data returned');
+                    return;
+                }
                 var date = data.lastupdate;
-                document.getElementById('update').innerHTML = date;
+                if (document.getElementById('update')) {
+                    document.getElementById('update').innerHTML = date;
+                }
                 map.date = new Date(date);
                 var markers;
                 if (refresh) {
@@ -188,6 +240,9 @@ Update = {
                         if (!line.length) continue;
                         L.polyline( line, { color: colour, weight: 4, opacity: opac } ).addTo(map);
                     }
+
+                    stations.clearLayers();
+                    trains.clearLayers();
 
                     markers = data.stations;
                     if (data.trains) markers = markers.concat(data.trains);
@@ -217,6 +272,9 @@ Update = {
                     }
                 }
                 if (refresh) {
+                    if (TrainTimes.fit_bounds) {
+                        map.fitBounds(stations.getBounds());
+                    }
                     window.setTimeout(Update.trains, 200);
                 }
                 Message.hideBox();
