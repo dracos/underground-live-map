@@ -30,8 +30,8 @@ foreach ($data as $line) {
     # Deal with the stop
     if (!array_key_exists($j[$col_StopID], $stops)) {
         $name = $j[$col_StopPointName];
-        if ($$j[$col_StopPointIndicator]) $name .= " ($j[$col_StopPointIndicator])";
-        if ($$j[$col_Towards]) $name .= "<br>towards $j[$col_Towards]";
+        if ($j[$col_StopPointIndicator]) $name .= " ($j[$col_StopPointIndicator])";
+        if ($j[$col_Towards]) $name .= "<br>towards $j[$col_Towards]";
         $stops[$j[$col_StopID]] = array( 'point' => array($j[$col_Latitude], $j[$col_Longitude]), 'name' => $name );
     }
     if (array_key_exists($j[$col_VehicleID], $vehicles)) {
