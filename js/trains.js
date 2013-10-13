@@ -4,6 +4,7 @@ var stations = new L.FeatureGroup([]);
 //var train_by_id = new Array();
 var starttime = new Date();
 var extra = 0;
+var Speed = 1;
 
 function read_hash() {
     var query = window.location.search.substring(1);
@@ -32,11 +33,11 @@ function load() {
 
     map = L.map('map', {
         attributionControl: false
-    }).setView(TrainTimes.centre, 13);
+    }).setView(TrainTimes.centre, TrainTimes.zoom || 13);
     L.control.attribution({ position: 'topleft' }).addTo(map);
 
     var tile_url, layer_opts = {
-        minZoom: 10,
+        minZoom: TrainTimes.minZoom || 10,
         maxZoom: 18
     };
     if (TrainTimes.map == 'black') {
@@ -107,7 +108,9 @@ var Train = train_marker.extend({
         this.updateDetails(train);
         this.info = '';
         this.angle = 0;
-        this.calculateLocation();
+        var now = new Date();
+        var secs = (starttime - map.date)/1000 + extra + (now - starttime)/1000*Speed;
+        this.calculateLocation(secs);
         if (TrainTimes.permanent_train_label) {
             this.createTitle();
         }
@@ -136,24 +139,45 @@ var Train = train_marker.extend({
         this.link = train.link
         this.route = train.next;
     },
-    calculateLocation: function() {
-        var now = new Date();
-        var secs = (starttime - map.date)/1000 + extra + (now - starttime)/1000;
+    calculateLocation: function(secs) {
         var point = 0;
         var from = this.startPoint;
         var from_name = this.justLeft;
+        if (from_name == '-' && this.route.length && secs < this.route[0].mins*60) {
+            // Don't care about these until they start
+            return;
+        }
         for (r=0; r<this.route.length; r++) {
             var stop = this.route[r];
             if (secs < stop.mins*60) {
-                var dlat = stop.point[0] - from[0];
-                var dlng = stop.point[1] - from[1];
-                var new_lat = from[0] + dlat/(stop.mins*60)*secs;
-                var new_lng = from[1] + dlng/(stop.mins*60)*secs;
+
+                if (from[1] == stop.point[1] && from[0] == stop.point[0]) {
+                    var new_lat = from[0];
+                    var new_lng = from[1];
+                } else if (typeof arc !== 'undefined') {
+                    var gc = new arc.GreatCircle(new arc.Coord(from[1], from[0]), new arc.Coord(stop.point[1], stop.point[0]));
+                    var gc_new = gc.interpolate(secs/(stop.mins*60));
+                    var new_lat = gc_new[1];
+                    var new_lng = gc_new[0];
+                } else {
+                    var dlat = stop.point[0] - from[0];
+                    var dlng = stop.point[1] - from[1];
+                    var new_lat = from[0] + dlat/(stop.mins*60)*secs;
+                    var new_lng = from[1] + dlng/(stop.mins*60)*secs;
+                }
+
                 point = [ new_lat, new_lng ];
                 this.info = '';
                 if (from_name) this.info += '(left '+from_name+',<br>';
-                this.info += 'expected ' + stop.name;
-                if (stop.dexp) this.info += ' '+stop.dexp;
+                if (TrainTimes.url == '/map/') {
+                    this.info += 'expected to ';
+                    this.info += (r==this.route.length-1) ? 'arrive' : 'depart';
+                    this.info += ' ' + stop.name;
+                    if (stop.dexp) this.info += ' at '+stop.dexp;
+                } else {
+                    this.info += 'expected ' + stop.name;
+                    if (stop.dexp) this.info += ' '+stop.dexp;
+                }
                 this.info += ')';
                 break;
             }
@@ -248,22 +272,67 @@ Update = {
                     document.getElementById('update').innerHTML = date;
                 }
                 map.date = new Date(date);
+                if (document.getElementById('station_name')) {
+                    document.getElementById('station_name').innerHTML = data.station;
+                }
+
                 var markers;
                 if (refresh) {
-                    var lines = data.polylines;
-                    for (l=0; lines && l<lines.length; l++) {
-                        var line = lines[l];
-                        var colour = line.shift();
-                        if (TrainTimes.line_colour) {
-                            colour = TrainTimes.line_colour;
+                    var center = data.center;
+                    if (center) {
+                        var span = data.span;
+                        var center_lat = center[0];
+                        var center_lng = center[1];
+                        var span_lat = span[0];
+                        var span_lng = span[1];
+                        var zoom = 6;
+                        if (span_lng && span_lat) {
+                            map.fitBounds( [
+                                [ center_lat-span_lat/2, center_lng-span_lng/2 ],
+                                [ center_lat+span_lat/2, center_lng+0+span_lng/2 ]
+                            ] );
+                        } else {
+                            map.setCenter(center, zoom);
                         }
-                        var opac = line.shift();
-                        if (!line.length) continue;
-                        L.polyline( line, { color: colour, weight: 4, opacity: opac } ).addTo(map);
+
+                        if (name == 'cla' && !document.getElementById('speedy').checked) {
+                            document.getElementById('speedy').checked = true;
+                            Update.speed();
+                        }
                     }
 
                     stations.clearLayers();
                     trains.clearLayers();
+
+                    var lines = data.polylines;
+                    for (l=0; lines && l<lines.length; l++) {
+                        var line = lines[l],
+                            colour = '#000',
+                            opac = 0.5;
+                        if (!line.length) continue;
+                        if (typeof line[0] != 'object') {
+                            colour = line.shift();
+                            if (TrainTimes.line_colour) {
+                                colour = TrainTimes.line_colour;
+                            }
+                            opac = line.shift();
+                            if (!line.length) continue;
+                        }
+                        if (typeof arc !== 'undefined') {
+                            var pts = [];
+                            for (ll=0; ll<line.length-1; ll++) {
+                                var gc = new arc.GreatCircle(new arc.Coord(line[ll][1], line[ll][0]), new arc.Coord(line[ll+1][1], line[ll+1][0]));
+                                gc = gc.Arc(100);
+                                gc = gc.geometries[0].coords;
+                                for (x=0; x<gc.length; x++) {
+                                    gc[x] = [ gc[x][1], gc[x][0] ];
+                                }
+                                pts.push.apply(pts, gc);
+                            }
+                            line = pts;
+                        }
+                        stations.addLayer( L.polyline( line, { color: colour, weight: 4, opacity: opac } ) );
+                    }
 
                     markers = data.stations;
                     if (data.trains) markers = markers.concat(data.trains);
@@ -276,7 +345,7 @@ Update = {
                 if (Update.refreshDataTimeout) {
                     window.clearTimeout(Update.refreshDataTimeout);
                 }
-                Update.refreshDataTimeout = window.setTimeout(Update.mapSubsequent, 1000*60*2);
+                Update.refreshDataTimeout = window.setTimeout(Update.mapSubsequent, 1000*60*(TrainTimes.refresh||2));
 
                 for (var pos=0; markers && pos<markers.length; pos++) {
                     if (markers[pos].name) { // Station
@@ -302,17 +371,33 @@ Update = {
                     if (TrainTimes.fit_bounds) {
                         map.fitBounds(stations.getBounds());
                     }
-                    window.setTimeout(Update.trains, 200);
+                    window.setTimeout(Update.trains, TrainTimes.update || 200);
                 }
                 Message.hideBox();
             }
         });
     },
     trains : function() {
+        var now = new Date();
+        var secs = (starttime - map.date)/1000 + extra + (now - starttime)/1000*Speed;
+        if (document.getElementById('current_time')) {
+            document.getElementById('current_time').innerHTML = new Date(map.date.getTime() + secs*1000).toLocaleTimeString();
+        }
         trains.eachLayer( function(train) {
-            train.calculateLocation();
+            train.calculateLocation(secs);
         });
-        window.setTimeout(Update.trains, 200);
+        window.setTimeout(Update.trains, TrainTimes.update || 200);
+    },
+    speed: function() {
+        var speed = document.getElementById('speedy');
+        var now = new Date();
+        if (speed.checked) {
+            Speed = 10;
+        } else {
+            extra += (now - starttime)/1000*(Speed-1);
+            Speed = 1;
+        }
+        starttime = now;
     }
 };
 

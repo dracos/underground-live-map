@@ -41,14 +41,14 @@ img {
     padding-top: 5px;
 }
 
-div.markerTooltip, div.markerDetail {
-    font-size: 83%;
-    color: black;
-    background-color: white;
-    white-space: nowrap;
+#options {
+    color: #000;
+    background-color: #fff;
+    opacity: 0.9;
+    position: absolute;
+    top: 0; left: 5em;
+    padding: 0.25em;
     margin: 0;
-    padding: 2px 4px;
-    border: 1px solid black;
 }
 
 #header {
