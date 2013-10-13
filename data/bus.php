@@ -17,7 +17,7 @@ extract($columns, EXTR_PREFIX_ALL, 'col');
 $url = 'http://countdown.api.tfl.gov.uk/interfaces/ura/instant_V1?';
 $url .= 'ReturnList=' . $cols_text;
 # $url .= '&StopAlso=True';
-$url .= '&LineName=' . urlencode($_GET['line']);
+$url .= '&LineName=' . urlencode(trim($_GET['line']));
 
 $data = file($url);
 

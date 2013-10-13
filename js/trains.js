@@ -14,7 +14,8 @@ function read_hash() {
         var dropdown = document.getElementById('line');
         if (dropdown && dropdown.options) {
             for (s=0; s<dropdown.options.length; s++) {
-                if (dropdown.options[s].value == query) {
+                var v = dropdown.options[s].value || dropdown.options[s].text;
+                if (v == query) {
                     dropdown.selectedIndex = s;
                     break;
                 }
@@ -154,7 +155,7 @@ var Train = L.CircleMarker.extend({
                 bearing = Math.atan2(dx, dy);
             this.angle = bearing;
         }
-        this.setLatLng(this.point)
+        this.setLatLng(this.point);
         this.createTitle();
     },
     getPathString: function () {
@@ -203,7 +204,7 @@ Update = {
             name, url;
         if (dropdown) {
             if (dropdown.options) {
-                name = dropdown.options[dropdown.selectedIndex].value;
+                name = dropdown.options[dropdown.selectedIndex].value || dropdown.options[dropdown.selectedIndex].text;
             } else {
                 name = dropdown.value;
             }
