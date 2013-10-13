@@ -2,23 +2,53 @@
 <html>
  <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Live map of London Underground trains</title>
   <link rel="stylesheet" href="/map/tube/lib/leaflet.css">
   <!--[if lte IE 8]>
     <link rel="stylesheet" href="/map/tube/lib/leaflet.ie.css">
   <![endif]-->
   <link rel="stylesheet" href="/map/tube/lib/leaflet.label.css">
+  <link rel="stylesheet" href="/map/tube/css.css">
   <link rel="stylesheet" href="/map/tube/skyfall/css.css">
   <script src="/map/tube/lib/leaflet.js"></script>
   <script src="/map/tube/lib/leaflet.label.js"></script>
   <script src="/map/tube/lib/reqwest.min.js"></script>
-  <script src="/map/tube/skyfall/trains.js"></script>
+  <script>
+    var TrainTimes = {
+      url: '/map/tube/',
+      centre: [51.507, -0.120],
+      fit_bounds: false,
+      station_hide: true,
+      map: 'black',
+      permanent_train_label: true,
+      line_colour: '#c00',
+      train_marker: L.Marker.extend({
+        options: {
+          icon: new L.Icon({
+            labelAnchor: [ -5, 5 ],
+            iconUrl: "/map/tube/skyfall/dot.png",
+            iconSize: [ 10, 10 ],
+            iconAnchor: [ 5, 5 ],
+            popupAnchor: [ 5, 1 ]
+          })
+        }
+      }),
+      train_colour: '#ff0'
+    };
+  </script>
+  <script src="/map/tube/js/trains.js"></script>
  </head>
  <body>
 
   <div id="map"><div style="padding: 1em; color: gray;">Loading...</div></div>
 
-  <h1>Live train map for the London Underground, by Matthew Somerville</h1>
+  <div id="header">
+  <h1>Live London Underground map</h1>
+  <p>By Matthew Somerville.
+<!--  <small>Data collected: <span id="update">No data yet</span></small> -->
+  </div>
+
 <noscript>
 <div style="border: solid 2px #cc0000; padding: 5px; width: 70%; margin: 1em auto;">
 I'm afraid that this page requires JavaScript to draw the maps and plot
@@ -28,12 +58,15 @@ However, all the data used to generate the map is accessible and available from
 Matthew
 </div>
 </noscript>
-  <p style="margin-bottom:0">
-   <small>Data collected: <span id="update">No data yet</span></small></p>
+
   <div id="loading"></div>
   <div id="info">
 
-<p id="showhide"><a href="" onclick="Info.Hide(); return false;">Hide &uarr;</a>
+<div id="info_show">
+<p class="showhide"><a href="" onclick="Info.Show(); return false;">More information</a></p>
+</div>
+<div id="info_shown">
+<p class="showhide"><a href="" onclick="Info.Hide(); return false;">Hide</a>
 
 <p><a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="dracos">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
 
@@ -42,8 +75,12 @@ Matthew
 <p>This map shows all trains on the London Underground network
 in real time, in the style of the map in Skyfall
 after seeing they had a version of my <a href="../">original</a> map :-)</p>
-<p>I have a (per-station) <a href="http://traintimes.org.uk/map/">National Rail version</a>,
-and an awesome <a href="http://traintimes.org.uk/">bookmarkable train times journey planner</a>.</p>
+
+<p>I have similar things for the <a href="/map/london-buses/">London buses</a>
+and <a href="http://traintimes.org.uk/map/">National Rail</a>,
+and an awesome <a href="http://traintimes.org.uk/">bookmarkable train times journey planner</a>.
+<a style="background-color: #ffff33; padding: 0 4px;" href="/donate">Donate</a>
+</p>
 <p style="margin-bottom:0; text-align:right">&mdash; <a href="http://twitter.com/dracos">Matthew</a>
 </div>
 
@@ -54,14 +91,11 @@ the site in action</a> courtesy of Gary Gale. -->
 <p>Live departure data is fetched from the
 <a href="http://www.tfl.gov.uk/businessandpartners/syndication/"><abbr title="Transport for London">TfL</abbr> API</a>,
 and then it does a bit of maths and magic.
-A small number of stations are misplaced or missing;
-occasional trains behave oddly; some <abbr title="Hammersmith and City">H&amp;C</abbr> and Circle stations are
+Some <abbr title="Hammersmith and City">H&amp;C</abbr> and Circle stations are
 missing in the TfL feed.</p>
 
 <h2>Who did this?</h2>
-<p><a href="http://twitter.com/dracos">Matthew Somerville</a>
-(with helpful hinderances from <a href="http://twitter.com/phae">Frances Berriman</a> and <a href="http://twitter.com/jaylett">James Aylett</a>).
-Station icon by <a href="http://red56.co.uk/">Tim Diggins</a>.
+<p><a href="http://dracos.co.uk/">Matthew Somerville</a>
 </p>
 
 <p id="footer">
@@ -69,6 +103,7 @@ Originally built at <a href="http://sciencehackday.com/">Science Hackday</a>, Ju
 <a href="http://github.com/dracos/underground-live-map">Source code</a>.
 </p>
 
+  </div>
   </div>
   <script type="text/javascript"> load(); </script>
  </body>
