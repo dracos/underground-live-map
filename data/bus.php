@@ -102,4 +102,5 @@ $out = array(
 $out = json_encode($out);
 
 header('Cache-Control: max-age=30');
+header('Content-Type: application/json');
 print $out;
