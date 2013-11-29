@@ -1,7 +1,7 @@
 var map = null;
 var trains = new L.LayerGroup([]);
 var stations = new L.FeatureGroup([]);
-//var train_by_id = new Array();
+var train_by_id = new Array();
 var starttime = new Date();
 var extra = 0;
 var Speed = 1;
@@ -132,7 +132,7 @@ var Train = train_marker.extend({
     },
     updateDetails: function(train) {
         this.train_id = train.id;
-        this.startPoint = train.point;
+        this.startPoint = this.point || train.point;
         this.justLeft = train.left;
         this.title = train.title;
         this.string = train.string;
@@ -338,7 +338,9 @@ Update = {
                     if (data.trains) markers = markers.concat(data.trains);
 
                 } else {
-                    trains.clearLayers();
+                    if (!TrainTimes.keep_trains) {
+                        trains.clearLayers();
+                    }
                     markers = data.trains;
                 }
 
@@ -353,18 +355,18 @@ Update = {
                             stations.addLayer( new Station(markers[pos]) );
                         }
                     } else if (markers[pos].title) { // Train
-                        //var train_id = markers[pos].id;
-                        //if (train_by_id[train_id]) {
-                                                //    train = train_by_id[train_id];
-                        //    train.updateDetails(markers[pos]);
-                        //} else {
-                        var t = new Train(markers[pos]);
-                        trains.addLayer(t);
-                        if (TrainTimes.permanent_train_label) {
-                            t.showLabel();
+                        var train_id = markers[pos].id;
+                        if (TrainTimes.keep_trains && train_by_id[train_id]) {
+                            train = train_by_id[train_id];
+                            train.updateDetails(markers[pos]);
+                        } else {
+                            var t = new Train(markers[pos]);
+                            trains.addLayer(t);
+                            if (TrainTimes.permanent_train_label) {
+                                t.showLabel();
+                            }
+                            train_by_id[train_id] = t;
                         }
-                        //    train_by_id[train_id] = train;
-                        //}
                     }
                 }
                 if (refresh) {
