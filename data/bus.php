@@ -53,8 +53,8 @@ foreach ($vehicles as $vehicle_id => $predictions) {
     $prior = null;
     foreach ($predictions as $p) {
         $n = $p[$col_StopID];
-        if ($prior) {
-            $route_prior[$n] = $prior;
+        if ($prior && !in_array($prior, $route_prior[$n])) {
+            $route_prior[$n][] = $prior;
         }
         $prior = $n;
     }
@@ -77,7 +77,17 @@ foreach ($vehicles as $vehicle_id => $predictions) {
         );
     }
     if ($route_prior[$first[$col_StopID]]) {
-        $stop = $stops[$route_prior[$first[$col_StopID]]];
+        $priors = $route_prior[$first[$col_StopID]];
+        $prior = $priors[0];
+        if (count($predictions) > 1) {
+            $second = $predictions[1][$col_StopID];
+            foreach ($priors as $prior) {
+                if ($prior != $second) {
+                    break;
+                }
+            }
+        }
+        $stop = $stops[$prior];
         $point = $stop['point'];
     } else {
         $point = array( $first[$col_Latitude], $first[$col_Longitude] );
