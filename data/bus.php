@@ -68,7 +68,7 @@ foreach ($vehicles as $vehicle_id => $predictions) {
     usort($predictions, 'time_sort');
     $first = $predictions[0];
     $id = $first[$col_RegistrationNumber];
-    $title = "$first[$col_LineName] to $first[$col_DestinationName] ($id)";
+    $title = "$first[$col_LineName] to $first[$col_DestinationName] ($id, id $first[$col_VehicleID])";
     $next = array();
     foreach ($predictions as $p) {
         $mins = ($p[$col_EstimatedTime]/1000 - time())/60;
