@@ -53,6 +53,9 @@ foreach ($vehicles as $vehicle_id => $predictions) {
     $prior = null;
     foreach ($predictions as $p) {
         $n = $p[$col_StopID];
+        if (!array_key_exists($n, $route_prior)) {
+            $route_prior[$n] = array();
+        }
         if ($prior && !in_array($prior, $route_prior[$n])) {
             $route_prior[$n][] = $prior;
         }
