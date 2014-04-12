@@ -303,6 +303,7 @@ Update = {
 
                     stations.clearLayers();
                     trains.clearLayers();
+                    train_by_id = new Array();
 
                     var lines = data.polylines;
                     for (l=0; lines && l<lines.length; l++) {
