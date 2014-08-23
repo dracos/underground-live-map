@@ -66,7 +66,7 @@ lines = {
 
 def parse_time(s):
     """Converts time in MM:SS, or - for 0, to time in seconds"""
-    if s == '-': return 0
+    if s == '-' or s == 'due': return 0
     m = re.match('(\d+):(\d+):(\d+)$', s)
     if m:
         return int(m.group(1))*3600 + int(m.group(2))*60 + int(m.group(3))
@@ -92,7 +92,7 @@ for key, line in lines.items():
         fp.close()
     stations = re.findall('<S Code="([^"]*)" N="([^"]*)">(.*?)</S>(?s)', live)
     for station_code, station_name, station  in stations:
-        platforms = re.findall('<P N="([^"]*)" Code="([^"]*)">(.*?)</P>(?s)', station)
+        platforms = re.findall('<P N="([^"]*)" Code="([^"]*)"[^>]*>(.*?)</P>(?s)', station)
         for platform_name, platform_code, platform in platforms:
             trains = re.findall('<T S="(.*?)" T="(.*?)" D="(.*?)" C="(.*?)" L="(.*?)" DE="(.*?)" />', platform)
             for set_id, trip_id, dest_code, time_to_station, current_location, destination in trains:
@@ -150,10 +150,12 @@ def canon_station_name(s, line):
         .replace('\xe2\x80\x99', "'") \
         .replace('St ', 'St. ') \
         .replace('Warren St.', 'Warren Street') \
+        .replace('Warren Station', 'Warren Street Station') \
         .replace('Elephant and Castle', 'Elephant &amp; Castle') \
         .replace('Elephant Station', 'Elephant &amp; Castle Station') \
         .replace('Lambeth Station', 'Lambeth North Station') \
         .replace('Castle and Lambeth North Station', 'Lambeth North Station') \
+        .replace('Castle and Kennington Station', 'Kennington Station') \
         .replace('Chalfont Station', 'Chalfont &amp; Latimer Station') \
         .replace('Chalfont and Latimer Station', 'Chalfont &amp; Latimer Station') \
         .replace('West Brompon', 'West Brompton') \
@@ -177,7 +179,9 @@ def canon_station_name(s, line):
         .replace("Kings Cross St. P Station", "King's Cross St. Pancras Station") \
         .replace("Kings Cross St. Pancras Station", "King's Cross St. Pancras Station") \
         .replace("Kings Cross Station", "King's Cross St. Pancras Station") \
-        .replace('Central Finchley', 'Finchley Central').replace('District and Picc', 'D &amp; P') \
+        .replace('Central Finchley', 'Finchley Central') \
+        .replace('District and Picc', 'D &amp; P') \
+        .replace('Finchley Central on the Southbound road', 'Finchley Central') \
         .replace('South Fields', 'Southfields') \
         .replace('Regents Park', "Regent's Park") \
         .replace('Bromley-by-Bow', "Bromley-By-Bow") \
@@ -188,7 +192,7 @@ def canon_station_name(s, line):
         .replace('Newbury Park Loop', 'Newbury Park') \
         .replace('ALperton', 'Alperton') \
         .replace('Moor park', 'Moor Park') \
-        .replace('Harrow-on-the-Hill', 'Harrow on the Hill')
+        .replace('Harrow-on-the-Hill', 'Harrow on the Hill').replace('Harrow-On-The-Hill', 'Harrow on the Hill')
     if s == 'Edgware Road Station' and line == 'B':
         s = 'Edgware Road Bakerloo Station'
     if s == 'Edgware Road Station' and line != 'B':
@@ -206,7 +210,7 @@ for line, ids in out.items():
         station_name = canon_station_name(arr['station_name'], line)
         if arr['current_location'] == 'At Platform':
             arr['location'] = station_locations[station_name]
-        m = re.match('(?:South of|Leaving|Left) (.*?)(?: towards .*)?$', arr['current_location'])
+        m = re.match('(?:South of|Leaving|Left) (.*?)(?:,? heading)?(?: (?:towards|to) .*)?$', arr['current_location'])
         if m:
             location_1 = station_locations[canon_station_name(m.group(1), line)]
             location_2 = station_locations[station_name]
