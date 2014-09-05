@@ -142,6 +142,8 @@ def canon_station_name(s, line):
     s = re.sub('^Olympia$', 'Kensington (Olympia)', s)
     s = re.sub('^Warwick Ave$', 'Warwick Avenue', s)
     s = re.sub('^Camden$', 'Camden Town', s)
+    s = s.replace('Camden Town (20B-20A)', 'Camden Town')
+    s = s.replace('Camden Town at Point 20A', 'Camden Town')
     s = re.sub('^Central$', 'Finchley Central', s) # They say "Between Central and East Finchley"
     s = re.sub('\s*Platform \d+$', '', s)
     s = s + ' Station'
@@ -156,6 +158,8 @@ def canon_station_name(s, line):
         .replace('Lambeth Station', 'Lambeth North Station') \
         .replace('Castle and Lambeth North Station', 'Lambeth North Station') \
         .replace('Castle and Kennington Station', 'Kennington Station') \
+        .replace('Kenntington', 'Kennington') \
+        .replace('Willlesden Green', 'Willesden Green') \
         .replace('Chalfont Station', 'Chalfont &amp; Latimer Station') \
         .replace('Chalfont and Latimer Station', 'Chalfont &amp; Latimer Station') \
         .replace('West Brompon', 'West Brompton') \
