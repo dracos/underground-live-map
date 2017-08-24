@@ -43,11 +43,8 @@ function load() {
     if (TrainTimes.map == 'black') {
         tile_url = '/map/tube/skyfall/black.png';
     } else {
-        tile_url = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-        if (query == 'transport') {
-            tile_url = 'http://{s}.tile2.opencyclemap.org/transport/{z}/{x}/{y}.png';
-        }
-        layer_opts.attribution = 'Map data by <a href="http://openstreetmap.org">OpenStreetMap</a>.';
+        tile_url = 'https://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=91e5e1e8ffa14239a883d928b58e0b48';
+        layer_opts.attribution = 'Map tiles © <a href="http://www.thunderforest.com">Thunderforest</a>, data © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>.';
     }
     L.tileLayer(tile_url, layer_opts).addTo(map);
     trains.addTo(map);
