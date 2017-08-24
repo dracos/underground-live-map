@@ -246,7 +246,12 @@ Update = {
             } else {
                 name = dropdown.value;
             }
-            url = 'http://www.traintimes.org.uk' + TrainTimes.url + '#' + name;
+            if (name == 'all-buses.json') {
+		TrainTimes.refresh = 30;
+	    } else {
+		TrainTimes.refresh = 0.5;
+	    }
+            url = 'https://www.traintimes.org.uk' + TrainTimes.url + '#' + name;
             document.getElementById('permalink').href = url;
             window.location.hash = name;
         } else {
