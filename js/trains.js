@@ -59,7 +59,7 @@ var Station;
 if (TrainTimes.station_icon) {
     var baseIcon = L.Icon.extend({
         options: {
-            shadowUrl: "http://traintimes.org.uk/map/tube/i/pin_shadow.png",
+            shadowUrl: "/map/tube/i/pin_shadow.png",
             shadowSize: [ 22, 20 ],
             shadowAnchor: [ 6, 20 ]
         }
@@ -71,7 +71,7 @@ if (TrainTimes.station_icon) {
         },
         options: {
             icon: new baseIcon({
-                iconUrl: "http://traintimes.org.uk/map/tube/i/station.png",
+                iconUrl: "/map/tube/i/station.png",
                 iconSize: [ 20, 20 ],
                 iconAnchor: [ 10, 20 ],
                 labelAnchor: [ 4, -13 ]
@@ -429,7 +429,7 @@ Message = {
         loading.style.display = 'block';
     },
     showWait : function() {
-        this._show('32px', '-16px', '<img src="http://traintimes.org.uk/map/tube/i/loading.gif" alt="Loading..." width="32" height="32">');
+        this._show('32px', '-16px', '<img src="/map/tube/i/loading.gif" alt="Loading..." width="32" height="32">');
     },
     showText : function(text) {
         setOpacity(document.getElementById('map'), 0.4);
