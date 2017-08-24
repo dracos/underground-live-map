@@ -52,6 +52,7 @@ img {
 }
 
 #header {
+    z-index: 1001;
     color: #000;
     background-color: #fff;
     opacity: 0.9;
@@ -70,6 +71,7 @@ img {
 }
 
 #info {
+    z-index: 1001;
     color: #000;
     background-color: #fff;
     position: absolute;
@@ -100,6 +102,7 @@ img {
 }
 
 #loading {
+    z-index: 1001;
     position: absolute;
     top: 50%; left: 50%;
     margin: 0 0 0 -16px;
