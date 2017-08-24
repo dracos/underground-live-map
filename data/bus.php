@@ -32,7 +32,18 @@ foreach ($data as $line) {
         $name = $j[$col_StopPointName];
         if ($j[$col_StopPointIndicator]) $name .= " ($j[$col_StopPointIndicator])";
         if ($j[$col_Towards]) $name .= "<br>towards $j[$col_Towards]";
-        $stops[$j[$col_StopID]] = array( 'point' => array($j[$col_Latitude], $j[$col_Longitude]), 'name' => $name );
+        $point = array($j[$col_Latitude], $j[$col_Longitude]);
+        if ($point[0] == 0 && $point[1] == 0 && $name == 'Summit Close<br>towards Queensbury') {
+            $point = array(51.606065, -0.276948);
+        }
+        if ($name == "Whitgift Centre (WJ)<br>towards Selsdon, Shirley or Wallington") {
+            # Not 54.072286, 0.022315
+            $point = array(51.3769688,-0.0987477);
+        }
+        if ($point[0] == 0 && $point[1] == 0) {
+            continue;
+        }
+        $stops[$j[$col_StopID]] = array( 'point' => $point, 'name' => $name );
     }
     if (array_key_exists($j[$col_VehicleID], $vehicles)) {
         array_push($vehicles[$j[$col_VehicleID]], $j);
@@ -72,11 +83,16 @@ foreach ($vehicles as $vehicle_id => $predictions) {
     $next = array();
     foreach ($predictions as $p) {
         $mins = ($p[$col_EstimatedTime]/1000 - time())/60;
+        $name = $p[$col_StopPointName];
+        $point = array( $p[$col_Latitude], $p[$col_Longitude] );
+        if ($point[0] == 0 && $point[1] == 0 && $name == 'Summit Close') {
+            $point = array(51.606065, -0.276948);
+        }
         $next[] = array(
             'dexp' => 'in ' . round($mins*2)/2 . ' minute' . (round(round($mins*2)/2)==1?'':'s'),
             'mins' => $mins,
-            'name' => $p[$col_StopPointName],
-            'point' => array( $p[$col_Latitude], $p[$col_Longitude] ),
+            'name' => $name,
+            'point' => $point,
         );
     }
     if ($route_prior[$first[$col_StopID]]) {
