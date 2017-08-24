@@ -82,7 +82,7 @@ if (TrainTimes.station_icon) {
                 weight: 2,
                 color: '#000',
                 opacity: 1,
-                radius: 4,
+                radius: 5,
                 fillColor: '#ff0',
                 fillOpacity: 1
             });
@@ -98,7 +98,7 @@ var Train = train_marker.extend({
             weight: 2,
             color: '#000',
             opacity: 1,
-            radius: 5,
+            radius: 7,
             fillColor: TrainTimes.train_colour,
             fillOpacity: 1
         });
