@@ -98,6 +98,7 @@ for key, line in lines.items():
             for set_id, trip_id, dest_code, time_to_station, current_location, destination in trains:
                 if current_location == '': continue
                 if 'Road 21' in station_name: continue # List doesn't have its location
+                if "Lord's Disused" in station_name: continue
                 time_to_station = parse_time(time_to_station)
                 train_key = set_id
                 train_key += '-%s' % dest_code
@@ -210,6 +211,7 @@ for line, ids in out.items():
         if 'Depot' in arr['current_location']: continue
         if 'Network Rail Track' in arr['current_location']: continue
         if 'North Acton Junction' in arr['current_location']: continue
+        if "Lord's Disused" in arr['current_location']: continue
         if 'Road 21' in arr['current_location']: continue # List doesn't have its location
         station_name = canon_station_name(arr['station_name'], line)
         if arr['current_location'] == 'At Platform':
