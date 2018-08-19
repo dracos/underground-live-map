@@ -255,6 +255,7 @@ if format=='traintimes':
         'station': 'London Underground',
         'lastupdate': mx.DateTime.ARPA.str(mx.DateTime.now()),
         'trains': [],
+        'stations': [],
     }
     outT = []
     for line, ids in out.items():
@@ -287,10 +288,18 @@ if format=='traintimes':
                 'id': '%s-%s' % (line, id),
                 'title': lines[line] + ' train to ' + arr['destination'] + ' [' + id + ']',
             })
-    grr = json.dumps(outJ, indent=4)
 
-    stations = open(dir + 'london-stations-new2.js').read()
-    grr = grr[:-2] + ',\n' + stations + '}' 
+    for name, points in sorted(station_locations.items()):
+        _, foo = points.popitem()
+        lat, lon = foo
+        outJ['stations'].append({
+            'point': [ lat, lon ],
+            'name': name,
+        })
+
+    grr = json.dumps(outJ, indent=2)
+    polylines = open(dir + 'london-lines.js').read()
+    grr = grr[:-2] + ',\n' + polylines + '}'
 
     fp = open(dir + options.output + '/london.jsonN', 'w')
     fp.write(grr)
