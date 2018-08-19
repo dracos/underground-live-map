@@ -25,30 +25,41 @@ function read_hash() {
             dropdown.value = query;
         }
     }
-    return query;
 }
 
 function load() {
-    var query = read_hash();
+    read_hash();
 
-    map = L.map('map', {
-        attributionControl: false
-    }).setView(TrainTimes.centre, TrainTimes.zoom || 13);
-    L.control.attribution({ position: 'topleft' }).addTo(map);
-
-    var tile_url, layer_opts = {
-        minZoom: TrainTimes.minZoom || 10,
-        maxZoom: 18
-    };
-    if (TrainTimes.map == 'black') {
-        tile_url = '/map/tube/skyfall/black.png';
+    if (TrainTimes.schematic) {
+        map = L.map('map', {
+            attributionControl: false,
+            maxZoom: 13,
+            minZoom: 10
+        }).setView(TrainTimes.centre, 10);
+        L.imageOverlay('/map/tube/schematic/map.png', [[52.0,-1], [51,1]], {
+            alt: 'TfL tube map'
+        }).addTo(map);
+        trains.addTo(map);
     } else {
-        tile_url = 'https://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=91e5e1e8ffa14239a883d928b58e0b48';
-        layer_opts.attribution = 'Map tiles © <a href="http://www.thunderforest.com">Thunderforest</a>, data © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>.';
+        map = L.map('map', {
+            attributionControl: false
+        }).setView(TrainTimes.centre, TrainTimes.zoom || 13);
+        L.control.attribution({ position: 'topleft' }).addTo(map);
+
+        var tile_url, layer_opts = {
+            minZoom: TrainTimes.minZoom || 10,
+            maxZoom: 18
+        };
+        if (TrainTimes.map == 'black') {
+            tile_url = '/map/tube/skyfall/black.png';
+        } else {
+            tile_url = 'https://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=91e5e1e8ffa14239a883d928b58e0b48';
+            layer_opts.attribution = 'Map tiles © <a href="http://www.thunderforest.com">Thunderforest</a>, data © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>.';
+        }
+        L.tileLayer(tile_url, layer_opts).addTo(map);
+        trains.addTo(map);
+        stations.addTo(map);
     }
-    L.tileLayer(tile_url, layer_opts).addTo(map);
-    trains.addTo(map);
-    stations.addTo(map);
     Update.mapStart();
 }
 
@@ -99,7 +110,7 @@ var Train = train_marker.extend({
             color: '#000',
             opacity: 1,
             radius: 7,
-            fillColor: TrainTimes.train_colour,
+            fillColor: train.title && (train.title.search(/to Special/) > -1) ? '#f00' : TrainTimes.train_colour,
             fillOpacity: 1
         });
         this.updateDetails(train);

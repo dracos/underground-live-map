@@ -1,40 +1,39 @@
 <!DOCTYPE html>
-<html>
+<html class="no-js">
  <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Live map of London Underground trains</title>
-  <link rel="stylesheet" href="/map/tube/lib/leaflet.css">
+  <link rel="stylesheet" href="/map/tube/lib/leaflet.core-and-label.css">
   <!--[if lte IE 8]>
     <link rel="stylesheet" href="/map/tube/lib/leaflet.ie.css">
   <![endif]-->
-  <link rel="stylesheet" href="/map/tube/lib/leaflet.label.css">
-  <link rel="stylesheet" href="/map/tube/css.css">
-  <script src="/map/tube/lib/leaflet.js"></script>
-  <script src="/map/tube/lib/leaflet.label.js"></script>
-  <script src="/map/tube/lib/reqwest.min.js"></script>
+  <link rel="stylesheet" href="/map/tube/css.css?2017-11-05c">
+  <script src="/map/tube/lib/leaflet.core-and-label.js"></script>
   <script>
+    var docEl = document.documentElement; docEl.className = docEl.className.replace(/\bno-js\b/,"js");
     var TrainTimes = {
       refresh: 1,
       keep_trains: true,
-      url: '/map/tube/',
+      url: '/map/tube/schematic/',
       centre: [51.507, -0.120],
       fit_bounds: false,
-      station_icon: true,
+      station_icon: false,
+      schematic: true,
       train_colour: '#ff0'
     };
   </script>
-  <script src="/map/tube/js/trains.js"></script>
+  <script src="/map/tube/js/trains.js?2018-08-19a"></script>
  </head>
  <body>
 
-  <div id="map"><div style="padding: 1em; color: gray;">Loading...</div></div>
+  <div id="map"><div style="padding: 1em; color: gray;"></div></div>
 
   <div id="header">
   <h1>Live London Underground map &ndash;
-Geographic |
-<a href="schematic/">Schematic</a> |
-<a href="skyfall/">Skyfall</a>
+<a href="../">Geographic</a> |
+Schematic |
+<a href="../skyfall/">Skyfall</a>
 </h1>
   <p>By Matthew Somerville.
   <small>Data collected: <span id="update">No data yet</span></small>
@@ -43,10 +42,9 @@ Geographic |
 <noscript>
 <div style="border: solid 2px #cc0000; padding: 5px; width: 70%; margin: 1em auto;">
 I'm afraid that this page requires JavaScript to draw the maps and plot
-move the trains, which isn't possible with just HTML.
-However, all the data used to generate the map is accessible and available from
-<a href="http://www.tfl.gov.uk/">Transport for London's website</a>. &mdash;
-Matthew
+move the trains, which isn't possible with just HTML. However, follow
+this link for a textual description of the entire network:
+<a href="../text.php">Textual description of the London Underground</a>
 </div>
 </noscript>
 
@@ -59,28 +57,27 @@ Matthew
 <div id="info_shown">
 <p class="showhide"><a href="" onclick="Info.Hide(); return false;">Hide</a>
 
-<p><a href="http://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="dracos">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script>
+<p><a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="dracos">Tweet</a><script type="text/javascript" src="https://platform.twitter.com/widgets.js"></script>
 
 <div style="margin-bottom: 1em;">
 <h2>What is this?</h2>
 <p>This map shows all trains (yellow dots) on the London Underground network
 in approximately real time.
-<a href="schematic/">Schematic version</a>, or
-<a href="skyfall/">Skyfall version</a></p>
+<a href="../">Geographic version</a>, or
+<a href="../skyfall/">Skyfall version</a>.</p>
 
 <p>I have similar things for the <a href="/map/london-buses/">London buses</a>
-and <a href="http://traintimes.org.uk/map/">National Rail</a>,
-and an awesome <a href="http://traintimes.org.uk/">bookmarkable train times journey planner</a>.
+and <a href="https://traintimes.org.uk/map/">National Rail</a>,
+and an awesome <a href="https://traintimes.org.uk/">bookmarkable train times journey planner</a>.
 <a style="background-color: #ffff33; padding: 0 4px;" href="/donate">Donate</a>
 </p>
 <p style="margin-bottom:0; text-align:right">&mdash; <a href="http://dracos.co.uk/">Matthew</a>
 </div>
 
-<!-- In the meantime, you can <a href="http://www.flickr.com/photos/vicchi/4730203122/">see a video of
+<!-- In the meantime, you can <a href="https://www.flickr.com/photos/vicchi/4730203122/">see a video of
 the site in action</a> courtesy of Gary Gale. -->
 
 <h2>How does it work?</h2>
- <a href="http://opendatachallenge.org/"><img border="0" align="right" src="/map/tube/i/trophy.png" hspace="5" height="100" width="55" alt="2nd prize App in the Open Data Challenge"></a>
 <p>Live departure data is fetched from the
 <a href="http://www.tfl.gov.uk/info-for/open-data-users/"><abbr title="Transport for London">TfL</abbr> API</a>,
 and then it does a bit of maths and magic.
@@ -88,14 +85,11 @@ Some <abbr title="Hammersmith and City">H&amp;C</abbr> and Circle stations are
 missing in the TfL feed.</p>
 
 <h2>Who did this?</h2>
-<p><a href="http://twitter.com/dracos">Matthew Somerville</a>
-(with helpful hinderances from <a href="http://twitter.com/phae">Frances Berriman</a> and <a href="http://twitter.com/jaylett">James Aylett</a>).
-Station icon by <a href="http://red56.co.uk/">Tim Diggins</a>.
-</p>
+<p><a href="https://twitter.com/dracos">Matthew Somerville</a>.</p>
 
 <p id="footer">
-Originally built at <a href="http://sciencehackday.com/">Science Hackday</a>, June 2010.
-<a href="http://github.com/dracos/underground-live-map">Source code</a>.
+Built in August 2018.
+<a href="https://github.com/dracos/underground-live-map">Source code</a>.
 </p>
 
   </div>
