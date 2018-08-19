@@ -14,12 +14,20 @@ function read_hash() {
     if (query) {
         var dropdown = document.getElementById('line');
         if (dropdown && dropdown.options) {
+            var found = false;
             for (s=0; s<dropdown.options.length; s++) {
                 var v = dropdown.options[s].value || dropdown.options[s].text;
                 if (v == query) {
                     dropdown.selectedIndex = s;
+                    found = true;
                     break;
                 }
+            }
+            if (!found) {
+                var opt = document.createElement('option');
+                opt.innerHTML = query;
+                dropdown.appendChild(opt);
+                dropdown.selectedIndex = dropdown.options.length - 1;
             }
         } else if (dropdown) {
             dropdown.value = query;
@@ -269,13 +277,8 @@ Update = {
             name = 'london.json';
         }
         Message.showWait();
-        reqwest({
-            url: TrainTimes.url + 'data/' + encodeURIComponent(name),
-            type: 'json',
-            error: function(err) {
-                Message.showText('Data could not be fetched');
-            },
-            success: function(data) {
+
+        function process_data(data) {
                 if (!data.stations.length && !data.trains.length) {
                     Message.showText('No data returned');
                     return;
@@ -390,8 +393,22 @@ Update = {
                     window.setTimeout(Update.trains, TrainTimes.update || 200);
                 }
                 Message.hideBox();
+        };
+
+        var request = new XMLHttpRequest();
+        request.open('GET', TrainTimes.url + 'data/' + encodeURIComponent(name), true);
+        request.onload = function() {
+            if (request.status >= 200 && request.status < 400) {
+                var data = JSON.parse(request.responseText);
+                process_data(data);
+            } else {
+                Message.showText('Data could not be fetched');
             }
-        });
+        };
+        request.onerror = function() {
+            Message.showText('Data could not be fetched');
+        };
+        request.send();
     },
     trains : function() {
         var now = new Date();

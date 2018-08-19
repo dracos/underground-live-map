@@ -4,15 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Live London bus map</title>
-  <link rel="stylesheet" href="/map/tube/lib/leaflet.css">
+  <link rel="stylesheet" href="/map/tube/lib/leaflet.core-and-label.css">
   <!--[if lte IE 8]>
     <link rel="stylesheet" href="/map/tube/lib/leaflet.ie.css">
   <![endif]-->
-  <link rel="stylesheet" href="/map/tube/lib/leaflet.label.css">
-  <link rel="stylesheet" href="/map/tube/css.css">
-  <script src="/map/tube/lib/leaflet.js"></script>
-  <script src="/map/tube/lib/leaflet.label.js"></script>
-  <script src="/map/tube/lib/reqwest.min.js"></script>
+  <link rel="stylesheet" href="/map/tube/css.css?2017-11-05">
+  <script src="/map/tube/lib/leaflet.core-and-label.js"></script>
   <script>
     var TrainTimes = {
       keep_trains: true,
@@ -24,14 +21,14 @@
       train_colour: '#f00'
     };
   </script>
-  <script src="/map/tube/js/trains.js"></script>
+  <script src="/map/tube/js/trains.js?2017-11-04a"></script>
  </head>
  <body>
 
   <div id="map"><div style="padding: 1em; color: gray;">Loading...</div></div>
 
   <div id="header">
-    <span style="float:right"><a href="http://twitter.com/share" class="twitter-share-button" data-count="none" data-via="dracos">Tweet</a><script type="text/javascript" src="http://platform.twitter.com/widgets.js"></script></span>
+    <span style="float:right"><a href="http://twitter.com/share" class="twitter-share-button" data-count="none" data-via="dracos">Tweet</a><script type="text/javascript" src="https://platform.twitter.com/widgets.js"></script></span>
   <h1>Live London bus map</h1>
   <p>By <a href="http://dracos.co.uk/">Matthew Somerville</a>.
   &nbsp;

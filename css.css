@@ -29,6 +29,7 @@ img {
     border: 0;
 }
 
+.no-js #map { display: none; }
 #map {
     width: 100%;
     height: 100%;
@@ -51,6 +52,7 @@ img {
     margin: 0;
 }
 
+.no-js #header { display: none; }
 #header {
     z-index: 1001;
     color: #000;
@@ -79,6 +81,9 @@ img {
     opacity: 0.9;
     width: auto;
     padding: 0.5em;
+}
+.no-js #info_show {
+    display: none;
 }
 #info_shown {
     display: none;
