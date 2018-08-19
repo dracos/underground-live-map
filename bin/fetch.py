@@ -3,6 +3,7 @@
 The client side code uses london.js for its static source data, e.g. geography of stations. """
 
 from __future__ import division 
+from collections import OrderedDict
 import urllib
 import re
 import simplejson as json
@@ -147,7 +148,7 @@ def parse_time(s):
     return int(m.group(1))*60 + int(m.group(2))
 
 # Loop through the trains
-out = {}
+out = OrderedDict()
 outNext = {}
 for key, line in lines.items():
     sub_id = 0
@@ -190,7 +191,7 @@ for key, line in lines.items():
                     'destination': destination,
                 }
                 if time_to_station < out.get(key, {}).get(train_key, {}).get('time_to_station', 999999):
-                    out.setdefault(key, {})[train_key] = entry
+                    out.setdefault(key, OrderedDict())[train_key] = entry
                 outNext.setdefault(key, {}).setdefault(train_key, []).append(entry)
                 #print '%s %s %s | %s %s %s' % (key, station_name, platform_name, set_id, time_to_station, current_location)
 
@@ -255,8 +256,13 @@ if format=='traintimes':
         'lastupdate': mx.DateTime.ARPA.str(mx.DateTime.now()),
         'trains': [],
     }
+    outT = []
     for line, ids in out.items():
         for id, arr in ids.items():
+            outT.append({
+                'id': id, 'time': arr['time_to_station'], 'line': lines[line],
+                'current': arr['current_location'] == 'At Platform' and 'At ' + arr['station_name'] or arr['current_location'],
+            })
             if 'location' not in arr: continue
             next = []
             outNext[line][id].sort(lambda x,y: cmp(x['time_to_station'], y['time_to_station']))
@@ -290,5 +296,7 @@ if format=='traintimes':
     fp.write(grr)
     fp.close()
     os.rename(dir + options.output + '/london.jsonN', dir + options.output + '/london.json')
+
+    json.dump(outT, open(dir + options.output + '/london-text.json', 'w'))
 
 print_debug( "Done")
