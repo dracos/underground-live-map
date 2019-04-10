@@ -2,7 +2,7 @@
 
 date_default_timezone_set('Europe/London');
 
-if (!$_GET['line']) {
+if (!isset($_GET['line'])) {
     print "Oh dear";
     exit;
 }
@@ -17,7 +17,11 @@ extract($columns, EXTR_PREFIX_ALL, 'col');
 $url = 'http://countdown.api.tfl.gov.uk/interfaces/ura/instant_V1?';
 $url .= 'ReturnList=' . $cols_text;
 # $url .= '&StopAlso=True';
-$url .= '&LineName=' . urlencode(trim($_GET['line']));
+if (strlen($_GET['line']) == 7) {
+    $url .= '&RegistrationNumber=' . urlencode(trim($_GET['line']));
+} else {
+    $url .= '&LineName=' . urlencode(trim($_GET['line']));
+}
 
 $data = file($url);
 
