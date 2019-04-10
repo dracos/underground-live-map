@@ -224,15 +224,23 @@ var Train = train_marker.extend({
         }
 
         if (L.Browser.svg) {
-            var rad1 = this.angle-Math.PI/4,
+            var rad1 = this.angle-Math.PI/8,
                 rad2 = this.angle,
-                rad3 = this.angle+Math.PI/4,
+                rad3 = this.angle+Math.PI/8,
                 rcostheta1 = r * Math.cos(rad1),
                 rsintheta1 = r * Math.sin(rad1),
                 rcostheta2 = r * Math.cos(rad2),
                 rsintheta2 = r * Math.sin(rad2),
                 rcostheta3 = r * Math.cos(rad3),
                 rsintheta3 = r * Math.sin(rad3);
+            if (location.search.search('pacman') > -1) {
+              return 'M' + (p.x + rsintheta3) + ',' + (p.y - rcostheta3) +
+                     'A' + r + ',' + r + ',0,1,1,' +
+                     (p.x + rsintheta1) + ',' + (p.y - rcostheta1) +
+                     'L' + (p.x) + ',' + (p.y) +
+                     'L' + (p.x + rsintheta3) + ',' + (p.y - rcostheta3) +
+                     ' z';
+            }
             return 'M' + p.x + ',' + (p.y - r) +
                    'A' + r + ',' + r + ',0,1,1,' +
                    (p.x - 0.1) + ',' + (p.y - r) +
