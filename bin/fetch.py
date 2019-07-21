@@ -154,10 +154,12 @@ def canon_station_name(s, line):
         .replace('Ruilsip', 'Ruislip') \
         .replace('Dagemham', 'Dagenham') \
         .replace('Paddington H &amp; C', 'Paddington') \
+        .replace('Paddington (Suburban)', 'Paddington') \
         .replace('Edgware Road (H &amp; C)', 'Edgware Road Circle') \
         .replace('Hammersmith (Circle and H&amp;C)', 'Hammersmith') \
         .replace('Hammersmith (C&amp;H)', 'Hammersmith') \
         .replace('Shepherds Bush (Central Line)', "Shepherd's Bush") \
+        .replace('Shepherds Bush Market', "Shepherd's Bush Market") \
         .replace('Terminals 123', 'Terminals 1, 2, 3').replace('Terminal 1,2,3', 'Terminals 1, 2, 3') \
         .replace('Woodford Junction', 'Woodford') \
         .replace("King's Cross Station", "King's Cross St. Pancras Station") \
