@@ -61,8 +61,8 @@ function load() {
         if (TrainTimes.map == 'black') {
             tile_url = '/map/tube/skyfall/black.png';
         } else {
-            tile_url = 'https://{s}.tile.thunderforest.com/transport/{z}/{x}/{y}.png?apikey=91e5e1e8ffa14239a883d928b58e0b48';
-            layer_opts.attribution = 'Map tiles © <a href="http://www.thunderforest.com">Thunderforest</a>, data © <a href="http://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>.';
+            tile_url = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+            layer_opts.attribution = 'Map tiles, data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>.';
         }
         L.tileLayer(tile_url, layer_opts).addTo(map);
         trains.addTo(map);
@@ -113,12 +113,13 @@ if (TrainTimes.station_icon) {
 var train_marker = TrainTimes.train_marker || L.CircleMarker;
 var Train = train_marker.extend({
     initialize: function(train, options) {
+        var fillColor = train.title && (train.title.search(/to Special/) > -1) ? '#999' : TrainTimes.train_colour;
         train_marker.prototype.initialize.call(this, train.point, {
             weight: 2,
             color: '#000',
             opacity: 1,
             radius: 7,
-            fillColor: train.title && (train.title.search(/to Special/) > -1) ? '#f00' : TrainTimes.train_colour,
+            fillColor: fillColor,
             fillOpacity: 1
         });
         this.updateDetails(train);
@@ -266,6 +267,7 @@ Update = {
     },
     map: function(refresh) {
         var dropdown = document.getElementById('line'),
+            override = document.getElementById('override'),
             name, url;
         if (dropdown) {
             if (dropdown.options) {
@@ -282,13 +284,13 @@ Update = {
             document.getElementById('permalink').href = url;
             window.location.hash = name;
         } else {
-            name = 'london.json';
+            name = override ? override.value : 'london.json';
         }
         Message.showWait();
 
         function process_data(data) {
                 if (!data.stations.length && !data.trains.length) {
-                    Message.showText('No data returned');
+                    Message.showText('No data returned, perhaps it is not currently running');
                     return;
                 }
                 var date = data.lastupdate;
