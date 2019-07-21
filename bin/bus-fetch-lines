@@ -1,0 +1,27 @@
+#!/usr/bin/python
+
+import json
+import re
+import urllib
+
+lines = set()
+for line in urllib.urlopen('http://countdown.api.tfl.gov.uk/interfaces/ura/instant_V1?ReturnList=LineName'):
+    j = json.loads(line)
+    if j[0] != 1: continue
+    line = j[1]
+    lines.add(line)
+
+def sorting(s):
+    if s.isdigit():
+        return (int(s),)
+    n = re.sub('^[A-Z]', '', s)
+    if n.isdigit():
+        return (9999, s[0], int(n))
+    else:
+        return (9999, s)
+
+out = ''
+for s in sorted(lines, key=sorting):
+    out += '<option>%s\n' % s
+
+print out
