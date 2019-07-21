@@ -19,6 +19,7 @@ parser = optparse.OptionParser()
 parser.add_option('-d', '--debug', action="store_true", help='true for noisy helpful execution, false or omitted for quiet.')
 parser.add_option('-s', '--stations', default='stations.json', help='JSON file to use for server station locations')
 parser.add_option('-o', '--output', default='../data', help='Output directory, relative to this script')
+parser.add_option('-n', '--new', action="store_true", help='Use new API, with DLR/Tram')
 
 (options, args) = parser.parse_args()
 debug_mode = options.debug
@@ -45,7 +46,10 @@ except Exception, ex:
 
 format = 'traintimes'
 
-api = 'http://cloud.tfl.gov.uk/TrackerNet/PredictionSummary/%s'
+if options.new:
+    api = 'https://api.tfl.gov.uk/Line/%s/Arrivals'
+else:
+    api = 'http://cloud.tfl.gov.uk/TrackerNet/PredictionSummary/%s'
 
 print_debug( "Processing %s" % options.stations)
 station_locations = json.load(open(dir + options.stations))
@@ -53,7 +57,24 @@ for name, pts in station_locations.items():
     if isinstance(pts, str):
         lng, lat = pts.split(',')
         station_locations[name] = { '*': (float(lat), float(lng)) }
-
+    if options.new:
+        switch = {
+            'B': 'bakerloo',
+            'C': 'central',
+            'D': 'district',
+            'H': 'hammersmith-city',
+            'J': 'jubilee',
+            'M': 'metropolitan',
+            'N': 'northern',
+            'P': 'piccadilly',
+            'V': 'victoria',
+            'W': 'waterloo-city',
+        }
+        for old, new in switch.items():
+            if old in station_locations[name]:
+                station_locations[name][new] = station_locations[name][old]
+                if old == 'H':
+                    station_locations[name]['circle'] = station_locations[name][old]
 
 lines = {
     'B': 'Bakerloo',
@@ -67,6 +88,24 @@ lines = {
     'V': 'Victoria',
     'W': 'Waterloo & City',
 }
+if options.new:
+    lines = {
+        #'london-overground': 'Overground',
+        'tram': 'Tram',
+        #'tfl-rail': 'TfL Rail',
+        'dlr': 'DLR',
+        'bakerloo': 'Bakerloo',
+        'central': 'Central',
+        'circle': 'Circle',
+        'district': 'District',
+        'hammersmith-city': 'Hammersmith & City',
+        'jubilee': 'Jubilee',
+        'metropolitan': 'Metropolitan',
+        'northern': 'Northern',
+        'piccadilly': 'Piccadilly',
+        'victoria': 'Victoria',
+        'waterloo-city': 'Waterloo & City',
+    }
 
 def canon_station_name(s, line):
     """Given a station name, try and reword it to match the station list"""
@@ -79,10 +118,19 @@ def canon_station_name(s, line):
     s = s.replace('Camden Town at Point 20A', 'Camden Town')
     s = re.sub('^Central$', 'Finchley Central', s) # They say "Between Central and East Finchley"
     s = re.sub('\s*Platform \d+$', '', s)
-    s = s + ' Station'
+    if line == 'tram':
+        s = s + ' Tram Stop'
+    elif line == 'dlr' or line == 'london-overground':
+        pass
+    else:
+        s = s + ' Station'
+    s = s.replace(' & ', ' &amp; ') # XXX
+    if isinstance(s, str):
+        s = s.replace('\xe2\x80\x99', "'")
+    else:
+        s = s.replace(u'\u2019', "'")
     s = s.replace('(Bakerloo)', 'Bakerloo').replace('Earls', 'Earl\'s') \
         .replace(' fast ', ' ') \
-        .replace('\xe2\x80\x99', "'") \
         .replace('St ', 'St. ') \
         .replace('Warren St.', 'Warren Street') \
         .replace('Warren Station', 'Warren Street Station') \
@@ -138,6 +186,9 @@ def canon_station_name(s, line):
 
 def parse_time(s):
     """Converts time in MM:SS, or - for 0, to time in seconds"""
+
+    if isinstance(s, int): return s
+
     if s == '-' or s == 'due': return 0
     m = re.match('(\d+):(\d+):(\d+)$', s)
     if m:
@@ -150,6 +201,55 @@ def parse_time(s):
 # Loop through the trains
 out = OrderedDict()
 outNext = {}
+
+def parse_entry(time_to_station, set_id, dest_code, destination, current_location, station_name, key, platform_name):
+    global sub_id, sub_ids
+
+    time_to_station = parse_time(time_to_station)
+    train_key = set_id
+    train_key += '-%s' % dest_code
+    if set_id in ('000', '477') or destination in ('Unknown', 'Special', 'Network Rail TOC') or dest_code == '0':
+    #or (set_id in ('015', '062', '113', '124') and key == 'N'):
+        lookup = re.sub('\s*Platform \d+$', '', current_location)
+        if current_location == 'At Platform':
+            lookup = 'At %s' % station_name
+        if not sub_ids.get(lookup):
+            sub_ids[lookup] = sub_id
+            sub_id += 1
+        train_key += '-%s' % sub_ids[lookup]
+    entry = {
+        'station_name': canon_station_name(re.sub('\.$', '', station_name), key),
+        'platform_name': platform_name,
+        'current_location': current_location,
+        'time_to_station': time_to_station,
+        'destination': destination,
+    }
+    if time_to_station < out.get(key, {}).get(train_key, {}).get('time_to_station', 999999):
+        out.setdefault(key, OrderedDict())[train_key] = entry
+    outNext.setdefault(key, {}).setdefault(train_key, []).append(entry)
+    #print '%s %s %s | %s %s %s' % (key, station_name, platform_name, set_id, time_to_station, current_location)
+
+def parse_json(live):
+    live = json.loads(live)
+    for prediction in live:
+        station_name = prediction['stationName'].replace(' Underground Station', '')
+        current_location = prediction.get('currentLocation', '')
+        dest_code = prediction.get('destinationNaptanId', '0')
+        parse_entry(prediction['timeToStation'], prediction['vehicleId'], dest_code,
+            prediction['towards'], current_location, station_name, key, prediction['platformName'])
+
+def parse_xml(live):
+    stations = re.findall('<S Code="([^"]*)" N="([^"]*)">(.*?)</S>(?s)', live)
+    for station_code, station_name, station  in stations:
+        platforms = re.findall('<P N="([^"]*)" Code="([^"]*)"[^>]*>(.*?)</P>(?s)', station)
+        for platform_name, platform_code, platform in platforms:
+            trains = re.findall('<T S="(.*?)" T="(.*?)" D="(.*?)" C="(.*?)" L="(.*?)" DE="(.*?)" />', platform)
+            for set_id, trip_id, dest_code, time_to_station, current_location, destination in trains:
+                if current_location == '': continue
+                if 'Road 21' in station_name: continue # List doesn't have its location
+                if "Lord's Disused" in station_name: continue
+                parse_entry(time_to_station, set_id, dest_code, destination, current_location, station_name, key, platform_name)
+
 for key, line in lines.items():
     sub_id = 0
     sub_ids = {}
@@ -162,38 +262,11 @@ for key, line in lines.items():
         fp = open(dir + 'cache/%s' % key, 'w')
         fp.write(live)
         fp.close()
-    stations = re.findall('<S Code="([^"]*)" N="([^"]*)">(.*?)</S>(?s)', live)
-    for station_code, station_name, station  in stations:
-        platforms = re.findall('<P N="([^"]*)" Code="([^"]*)"[^>]*>(.*?)</P>(?s)', station)
-        for platform_name, platform_code, platform in platforms:
-            trains = re.findall('<T S="(.*?)" T="(.*?)" D="(.*?)" C="(.*?)" L="(.*?)" DE="(.*?)" />', platform)
-            for set_id, trip_id, dest_code, time_to_station, current_location, destination in trains:
-                if current_location == '': continue
-                if 'Road 21' in station_name: continue # List doesn't have its location
-                if "Lord's Disused" in station_name: continue
-                time_to_station = parse_time(time_to_station)
-                train_key = set_id
-                train_key += '-%s' % dest_code
-                if set_id in ('000', '477') or destination in ('Unknown', 'Special', 'Network Rail TOC') or dest_code == '0':
-                #or (set_id in ('015', '062', '113', '124') and key == 'N'):
-                    lookup = re.sub('\s*Platform \d+$', '', current_location)
-                    if current_location == 'At Platform':
-                        lookup = 'At %s' % station_name
-                    if not sub_ids.get(lookup):
-                        sub_ids[lookup] = sub_id
-                        sub_id += 1
-                    train_key += '-%s' % sub_ids[lookup]
-                entry = {
-                    'station_name': canon_station_name(re.sub('\.$', '', station_name), key),
-                    'platform_name': platform_name,
-                    'current_location': current_location,
-                    'time_to_station': time_to_station,
-                    'destination': destination,
-                }
-                if time_to_station < out.get(key, {}).get(train_key, {}).get('time_to_station', 999999):
-                    out.setdefault(key, OrderedDict())[train_key] = entry
-                outNext.setdefault(key, {}).setdefault(train_key, []).append(entry)
-                #print '%s %s %s | %s %s %s' % (key, station_name, platform_name, set_id, time_to_station, current_location)
+
+    if options.new:
+        parse_json(live)
+    else:
+        parse_xml(live)
 
 # Remove trains that have the same ID, but a higher time_to_station - probably the same train
 print_debug( "Removing duplicate trains")
@@ -211,7 +284,11 @@ for key, ids in out.items():
 def lookup(line, name):
     if line in station_locations[name]:
         return station_locations[name][line]
-    return station_locations[name]['*']
+    if options.new and options.debug: print line, station_locations[name]
+    try:
+        return station_locations[name]['*']
+    except:
+        print 'Error looking up', name, line, station_locations[name]
 
 print_debug ("Processing stations")
 for line, ids in out.items():
@@ -222,8 +299,12 @@ for line, ids in out.items():
         if 'North Acton Junction' in arr['current_location']: continue
         if "Lord's Disused" in arr['current_location']: continue
         if 'Road 21' in arr['current_location']: continue # List doesn't have its location
+
         station_name = arr['station_name']
         if arr['current_location'] == 'At Platform':
+            arr['location'] = lookup(line, station_name)
+
+        if not arr['current_location'] and line in ('dlr', 'london-overground', 'tram'):
             arr['location'] = lookup(line, station_name)
 
         m = re.match('(?:South of|Leaving|Left) (.*?)(?:,? heading)?(?: (?:towards|to) .*)?$', arr['current_location'])
