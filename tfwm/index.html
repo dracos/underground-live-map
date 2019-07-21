@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Live Birmingham map</title>
+  <link rel="stylesheet" href="/map/tube/lib/leaflet.core-and-label.css">
+  <!--[if lte IE 8]>
+    <link rel="stylesheet" href="/map/tube/lib/leaflet.ie.css">
+  <![endif]-->
+  <link rel="stylesheet" href="/map/tube/css.css?2017-11-05">
+  <script src="/map/tube/lib/leaflet.core-and-label.js"></script>
+  <script>
+    var TrainTimes = {
+      keep_trains: true,
+      refresh: 2,
+      url: '/map/tfwm/',
+      centre: [52.45, -1.9],
+      fit_bounds: true,
+      station_icon: false,
+      train_colour: '#f00'
+    };
+  </script>
+  <script src="/map/tube/js/trains.js?2019-07-21"></script>
+ </head>
+ <body>
+
+  <div id="map"><div style="padding: 1em; color: gray;">Loading...</div></div>
+
+  <div id="header">
+    <span style="float:right"><a href="https://twitter.com/share" class="twitter-share-button" data-count="none" data-via="dracos">Tweet</a><script type="text/javascript" src="https://platform.twitter.com/widgets.js"></script></span>
+  <h1>Live West Midlands bus map</h1>
+  <p>By <a href="http://dracos.co.uk/">Matthew Somerville</a>.
+  &nbsp;
+  <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background-color:#f00;border:solid 2px black;"></span>
+  bus
+  <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background-color:#ff0;border:solid 2px black;"></span>
+  stop.
+
+  <p>Choose route: <select id="line" onchange="Update.map(true);">
+<option>1
+<option>1a
+<option>002
+<option>2
+<option>3
+<option>3a
+<option>4
+<option>4a
+<option>4h
+<option>4m
+<option>5
+<option>6
+<option>6a
+<option>7
+<option>7a
+<option>8
+<option>8a
+<option>8c
+<option>9
+<option>9a
+<option>10
+<option>10a
+<option>11
+<option>11a
+<option selected>11c
+<option>11u
+<option>12
+<option>12a
+<option>12x
+<option>13
+<option>13a
+<option>14
+<option>14a
+<option>15
+<option>16
+<option>16a
+<option>16w
+<option>17
+<option>18
+<option>18a
+<option>19
+<option>20
+<option>20a
+<option>20b
+<option>20c
+<option>21
+<option>21s
+<option>23
+<option>23a
+<option>24
+<option>25
+<option>27
+<option>27a
+<option>28
+<option>28a
+<option>29
+<option>31
+<option>32
+<option>33
+<option>34
+<option>35
+<option>36
+<option>39
+<option>40
+<option>41
+<option>42
+<option>43
+<option>43a
+<option>44
+<option>45
+<option>46
+<option>47
+<option>48
+<option>48a
+<option>49
+<option>50
+<option>51
+<option>52
+<option>54
+<option>55
+<option>58
+<option>58a
+<option>59
+<option>60
+<option>61
+<option>63
+<option>65
+<option>66
+<option>67
+<option>68a
+<option>69
+<option>70
+<option>70a
+<option>71
+<option>72
+<option>73
+<option>74
+<option>74s
+<option>76
+<option>77
+<option>78
+<option>78a
+<option>79
+<option>80
+<option>80a
+<option>81
+<option>82
+<option>87
+<option>88
+<option>89
+<option>94
+<option>96
+<option>97
+<option>101
+<option>110
+<option>125
+<option>126
+<option>142
+<option>144
+<option>145
+<option>146
+<option>192
+<option>202
+<option>226
+<option>229
+<option>310
+<option>326
+<option>401e
+<option>529
+<option>539
+<option>580
+<option>700
+<option>703
+<option>822
+<option>823
+<option>829
+<option>876
+<option>877
+<option>878
+<option>891
+<option>907
+<option>907a
+<option>934
+<option>935
+<option>936
+<option>937
+<option>997
+<option>997e
+<option>fd
+<option>x1
+<option>x10
+<option>x12
+<option>x14
+<option>x16
+<option>x2
+<option>x20
+<option>x21
+<option>x22
+<option>x3
+<option>x30
+<option>x4
+<option>x5
+<option>x51
+<option>x7
+<option>x70
+<option>x8
+<option value="all">ALL
+  </select>
+
+  <small>Data collected: <span id="update">No data yet</span></small>
+<a href="/map/tfwm/" id="permalink">Link to this</a>
+   </div>
+
+<noscript>
+<div style="border: solid 2px #cc0000; padding: 5px; width: 70%; margin: 1em auto;">
+I'm afraid that this page requires JavaScript to draw the maps and plot
+move the buses, which isn't possible with just HTML.
+However, all the data used to generate the map is accessible and available from
+<a href="https://www.tfwm.org.uk/">Transport for West Midlands's website</a>. &mdash;
+Matthew
+</div>
+</noscript>
+
+  <div id="loading"></div>
+  <div id="info">
+
+<div id="info_show">
+<p class="showhide"><a href="" onclick="Info.Show(); return false;">More information</a></p>
+</div>
+<div id="info_shown">
+<p class="showhide"><a href="" onclick="Info.Hide(); return false;">Hide</a>
+
+<div style="margin-bottom: 1em;">
+<h2>What is this?</h2>
+<p>This map shows buses and their stops (red and yellow dots) on the West Midlands bus
+network in approximately real time &ndash; thanks,
+<a href="https://www.tfwm.org.uk/"><abbr title="Transport for West Midlands">TfWM</abbr></a>!
+
+<p>I have similar things for the <a href="/map/tube/">Tube</a> and <a href="/map/london-buses/">London buses</a>,
+and an awesome <a href="/">bookmarkable train times journey planner</a>.
+<a style="background-color: #ffff33; padding: 0 4px;" href="/donate">Donate</a>
+</p>
+<p style="margin-bottom:0; text-align:right">&mdash; <a href="http://dracos.co.uk/">Matthew</a>, February 2019
+</div>
+
+  </div>
+  </div>
+  <script type="text/javascript"> load(); </script>
+ </body>
+</html>

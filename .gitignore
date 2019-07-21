@@ -1,5 +1,9 @@
+*.pyc
 data/all-buses.json
 data/london.json
 data/london-text.json
 schematic/data
 bin/cache
+/tfwm/data
+/tfwm/bin/cache
+/tfwm/bin/config.py
