@@ -10,7 +10,7 @@ tr:nth-child(even) { background-color: #eef; }
 </style>
 <div id="content">
 <h2>Next Accessible District Line tube
-<?
+<?php
 
 function pretty($t) {
     $t = preg_replace('#:00#', ' min', $t);
