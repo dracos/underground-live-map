@@ -234,7 +234,6 @@ def parse_entry(time_to_station, set_id, dest_code, destination, current_locatio
     #print '%s %s %s | %s %s %s' % (key, station_name, platform_name, set_id, time_to_station, current_location)
 
 def parse_json(live):
-    live = json.loads(live)
     for prediction in live:
         station_name = prediction['stationName'].replace(' Underground Station', '')
         current_location = prediction.get('currentLocation', '')
@@ -261,11 +260,20 @@ for key, line in lines.items():
         if time.time() - os.path.getmtime('cache/%s' % key) > 100:
             raise Exception, 'Too old'
         live = open(dir + 'cache/%s' % key).read()
+        live = json.loads(live)
     except:
-        live = urllib.urlopen(api % key).read()
-        fp = open(dir + 'cache/%s' % key, 'w')
-        fp.write(live)
-        fp.close()
+        while True:
+            live = urllib.urlopen(api % key).read()
+            fp = open(dir + 'cache/%s' % key, 'w')
+            fp.write(live)
+            fp.close()
+            live = json.loads(live)
+            if isinstance(live, dict) and live.get('statusCode') == 429:
+                #print live['message']
+                m = re.search('Try again in (\d+) second', live['message'])
+                time.sleep(int(m.group(1)))
+            else:
+                break
 
     if options.new:
         parse_json(live)
