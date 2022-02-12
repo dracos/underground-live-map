@@ -17,7 +17,7 @@ extract($columns, EXTR_PREFIX_ALL, 'col');
 $url = 'http://countdown.api.tfl.gov.uk/interfaces/ura/instant_V1?';
 $url .= 'ReturnList=' . $cols_text;
 # $url .= '&StopAlso=True';
-if (strlen($_GET['line']) == 7) {
+if (strlen($_GET['line']) == 7 && !preg_match('#,#', $_GET['line'])) {
     $url .= '&RegistrationNumber=' . urlencode(trim($_GET['line']));
 } else {
     $url .= '&LineName=' . urlencode(trim($_GET['line']));
