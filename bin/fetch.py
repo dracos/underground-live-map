@@ -294,6 +294,8 @@ for key, ids in out.items():
                         if out[key].get(id): del out[key][id]
         
 def lookup(line, name):
+    if name not in station_locations and options.stations == 'stations-schematic.json':
+        return (0,0)
     if line in station_locations[name]:
         return station_locations[name][line]
     if options.new and options.debug: print line, station_locations[name]
