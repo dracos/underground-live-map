@@ -1,8 +1,8 @@
-#!/srv/.virtualenvs/tfwm/bin/python
+#!/usr/bin/python3
 
 from __future__ import division 
 import csv
-import urllib
+import urllib.request
 import json
 import time
 import datetime
@@ -23,29 +23,29 @@ for line in c:
     station_locations[line['ATCOCode']] = (float(line['Latitude']), float(line['Longitude']), name)
 
 try:
-    if time.time() - os.path.getmtime(DIR + 'cache/%s' % key) > 100:
-        raise Exception, 'Too old'
+    if time.time() - os.path.getmtime(DIR + 'cache/TfWM') > 100:
+        raise Exception('Too old')
     live = open(DIR + 'cache/TfWM', 'rb').read()
 except:
     url = 'http://api.tfwm.org.uk/gtfs/trip_updates?app_id=%s&app_key=%s' % (APP_ID, APP_KEY)
-    live = urllib.urlopen(url).read()
+    live = urllib.request.urlopen(url).read()
     fp = open(DIR + 'cache/TfWM', 'wb')
     fp.write(live)
     fp.close()
 
 try:
-    if time.time() - os.path.getmtime(DIR + 'cache/%s' % key) > 3600:
-        raise Exception, 'Too old'
-    lines = open(DIR + 'cache/TfWM-routes', 'rb')
+    if time.time() - os.path.getmtime(DIR + 'cache/TfWM-routes') > 3600:
+        raise Exception('Too old')
+    lines = open(DIR + 'cache/TfWM-routes', 'rb').read()
 except:
     url = 'http://api.tfwm.org.uk/Line/Route?app_id=%s&app_key=%s&formatter=json' % (APP_ID, APP_KEY)
-    lines = urllib.urlopen(url)
+    lines = urllib.request.urlopen(url).read()
     fp = open(DIR + 'cache/TfWM-routes', 'wb')
-    fp.write(live)
+    fp.write(lines)
     fp.close()
 
 route_to_number = {}
-lines = json.load(lines)
+lines = json.loads(lines)
 for line in lines['ArrayOfLine']['Line']:
     route_to_number[line['Id']] = line['Name']
 

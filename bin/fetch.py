@@ -1,16 +1,16 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 """ Create the file /data/london.js from the sources files within the /data folder.
 The client side code uses london.js for its static source data, e.g. geography of stations. """
 
 from __future__ import division 
 from collections import OrderedDict
-import urllib
+import datetime
+import urllib.request
 import re
 import simplejson as json
 import time
 import os
 import os.path
-import mx.DateTime
 
 import optparse
 
@@ -27,7 +27,7 @@ debug_mode = options.debug
 """ Print the string only if we're in debug mode. """
 def print_debug(out):
     if debug_mode:
-        print out
+        print(out)
         
 # get the directory containing this file, fetch.py, which is in the /bin directory within the project.
 dir = os.getcwd() + '/'
@@ -38,7 +38,7 @@ print_debug( 'Creating and populating directories: \n%s and \n%s' % ( dir + 'cac
 try:
     os.mkdir(dir + 'cache')
     os.mkdir(dir + options.output)
-except Exception, ex:
+except Exception as ex:
     pass # ignore - probably exists already.
 
 # If the above approach doesn't work for you, you could hard code dir like this:
@@ -199,7 +199,7 @@ def parse_time(s):
         return int(m.group(1))*3600 + int(m.group(2))*60 + int(m.group(3))
     m = re.match('(\d+):(\d+)$', s)
     if not m:
-        raise Exception, 'Did not match time %s' % s
+        raise Exception('Did not match time %s' % s)
     return int(m.group(1))*60 + int(m.group(2))
 
 # Loop through the trains
@@ -258,22 +258,26 @@ for key, line in lines.items():
     sub_ids = {}
     try:
         if time.time() - os.path.getmtime('cache/%s' % key) > 100:
-            raise Exception, 'Too old'
+            raise Exception('Too old')
         live = open(dir + 'cache/%s' % key).read()
         live = json.loads(live)
     except:
         while True:
-            live = urllib.urlopen(api % key).read()
-            fp = open(dir + 'cache/%s' % key, 'w')
+            try:
+                live = urllib.request.urlopen(api % key).read()
+            except urllib.error.HTTPError as e:
+                if e.code == 429:
+                    #print live['message']
+                    m = re.search('Try again in (\d+) second', live['message'])
+                    time.sleep(int(m.group(1)))
+                    continue
+                else:
+                    raise
+            fp = open(dir + 'cache/%s' % key, 'wb')
             fp.write(live)
             fp.close()
             live = json.loads(live)
-            if isinstance(live, dict) and live.get('statusCode') == 429:
-                #print live['message']
-                m = re.search('Try again in (\d+) second', live['message'])
-                time.sleep(int(m.group(1)))
-            else:
-                break
+            break
 
     if options.new:
         parse_json(live)
@@ -282,27 +286,30 @@ for key, line in lines.items():
 
 # Remove trains that have the same ID, but a higher time_to_station - probably the same train
 print_debug( "Removing duplicate trains")
-for key, ids in out.items():
-    for id, arr in ids.items():
-        for key2, ids2 in out.items():
+#dupes = set()
+for key, ids in list(out.items()):
+    for id, arr in list(ids.items()):
+        for key2, ids2 in list(out.items()):
             if key == key2: continue
-            for id2, arr2 in ids2.items():
+            for id2, arr2 in list(ids2.items()):
                 if id == id2:
                     if arr['time_to_station'] < arr2['time_to_station']:
                         if out[key].get(id2): del out[key2][id2]
                     else:
                         if out[key].get(id): del out[key][id]
-        
+#for key, ids in out.items():
+#    out[key] = {id:arr for id,arr in ids.items() if (key, id) not in dupes}
+
 def lookup(line, name):
     if name not in station_locations and options.stations == 'stations-schematic.json':
         return (0,0)
     if line in station_locations[name]:
         return station_locations[name][line]
-    if options.new and options.debug: print line, station_locations[name]
+    if options.new and options.debug: print(line, station_locations[name])
     try:
         return station_locations[name]['*']
     except:
-        print 'Error looking up', name, line, station_locations[name]
+        print('Error looking up', name, line, station_locations[name])
 
 print_debug ("Processing stations")
 for line, ids in out.items():
@@ -348,7 +355,7 @@ print_debug( "Building trains and travel time data")
 if format=='traintimes':
     outJ = {
         'station': 'London Underground',
-        'lastupdate': mx.DateTime.ARPA.str(mx.DateTime.now()),
+        'lastupdate': datetime.datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
         'trains': [],
         'stations': [],
     }
@@ -361,7 +368,7 @@ if format=='traintimes':
             })
             if 'location' not in arr: continue
             next = []
-            outNext[line][id].sort(lambda x,y: cmp(x['time_to_station'], y['time_to_station']))
+            outNext[line][id].sort(key=lambda x: x['time_to_station'])
             for n in outNext[line][id]:
                 stat = n['station_name']
                 location = lookup(line, stat)
