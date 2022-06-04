@@ -58,6 +58,7 @@ for name, pts in station_locations.items():
         'B': 'bakerloo',
         'C': 'central',
         'D': 'district',
+        'E': 'elizabeth',
         'H': 'hammersmith-city',
         'J': 'jubilee',
         'M': 'metropolitan',
@@ -81,6 +82,7 @@ lines = {
     'central': 'Central',
     'circle': 'Circle',
     'district': 'District',
+    'elizabeth': 'Elizabeth',
     'hammersmith-city': 'Hammersmith & City',
     'jubilee': 'Jubilee',
     'metropolitan': 'Metropolitan',
@@ -97,13 +99,15 @@ def canon_station_name(s, line):
     s = re.sub('^Olympia$', 'Kensington (Olympia)', s)
     s = re.sub('^Warwick Ave$', 'Warwick Avenue', s)
     s = re.sub('^Camden$', 'Camden Town', s)
+    s = re.sub('Notting Hill Ga$', 'Notting Hill Gate', s)
+    s = re.sub('High Street Kensingt$', 'High Street Kensington', s)
     s = s.replace('Camden Town (20B-20A)', 'Camden Town')
     s = s.replace('Camden Town at Point 20A', 'Camden Town')
     s = re.sub('^Central$', 'Finchley Central', s) # They say "Between Central and East Finchley"
     s = re.sub('\s*Platform \d+$', '', s)
     if line == 'tram':
         s = s + ' Tram Stop'
-    elif line == 'dlr' or line == 'london-overground':
+    elif line in ('dlr', 'london-overground', 'elizabeth'):
         pass
     else:
         s = s + ' Station'
@@ -295,7 +299,7 @@ for line, ids in out.items():
         if arr['current_location'] == 'At Platform':
             arr['location'] = lookup(line, station_name)
 
-        if not arr['current_location'] and line in ('dlr', 'london-overground', 'tram'):
+        if not arr['current_location'] and line in ('dlr', 'london-overground', 'tram', 'elizabeth'):
             arr['location'] = lookup(line, station_name)
 
         m = re.match('(?:South of|Leaving|Left) (.*?)(?:,? heading)?(?: (?:towards|to) .*)?$', arr['current_location'])
