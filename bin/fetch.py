@@ -11,6 +11,7 @@ import simplejson as json
 import time
 import os
 import os.path
+import sys
 
 import optparse
 
@@ -19,15 +20,14 @@ parser = optparse.OptionParser()
 parser.add_option('-d', '--debug', action="store_true", help='true for noisy helpful execution, false or omitted for quiet.')
 parser.add_option('-s', '--stations', default='stations.json', help='JSON file to use for server station locations')
 parser.add_option('-o', '--output', default='../data', help='Output directory, relative to this script')
-parser.add_option('-n', '--new', action="store_true", help='Use new API, with DLR/Tram')
 
 (options, args) = parser.parse_args()
 debug_mode = options.debug
 
 """ Print the string only if we're in debug mode. """
-def print_debug(out):
+def print_debug(*out):
     if debug_mode:
-        print(out)
+        print(*out)
         
 # get the directory containing this file, fetch.py, which is in the /bin directory within the project.
 dir = os.getcwd() + '/'
@@ -46,10 +46,7 @@ except Exception as ex:
 
 format = 'traintimes'
 
-if options.new:
-    api = 'https://api.tfl.gov.uk/Line/%s/Arrivals'
-else:
-    api = 'http://cloud.tfl.gov.uk/TrackerNet/PredictionSummary/%s'
+api = 'https://api.tfl.gov.uk/Line/%s/Arrivals'
 
 print_debug( "Processing %s" % options.stations)
 station_locations = json.load(open(dir + options.stations))
@@ -57,55 +54,41 @@ for name, pts in station_locations.items():
     if isinstance(pts, str):
         lng, lat = pts.split(',')
         station_locations[name] = { '*': (float(lat), float(lng)) }
-    if options.new:
-        switch = {
-            'B': 'bakerloo',
-            'C': 'central',
-            'D': 'district',
-            'H': 'hammersmith-city',
-            'J': 'jubilee',
-            'M': 'metropolitan',
-            'N': 'northern',
-            'P': 'piccadilly',
-            'V': 'victoria',
-            'W': 'waterloo-city',
-        }
-        for old, new in switch.items():
-            if old in station_locations[name]:
-                station_locations[name][new] = station_locations[name][old]
-                if old == 'H':
-                    station_locations[name]['circle'] = station_locations[name][old]
+    switch = {
+        'B': 'bakerloo',
+        'C': 'central',
+        'D': 'district',
+        'H': 'hammersmith-city',
+        'J': 'jubilee',
+        'M': 'metropolitan',
+        'N': 'northern',
+        'P': 'piccadilly',
+        'V': 'victoria',
+        'W': 'waterloo-city',
+    }
+    for old, new in switch.items():
+        if old in station_locations[name]:
+            station_locations[name][new] = station_locations[name][old]
+            if old == 'H':
+                station_locations[name]['circle'] = station_locations[name][old]
 
 lines = {
-    'B': 'Bakerloo',
-    'C': 'Central',
-    'D': 'District',
-    'H': 'Hammersmith & Circle',
-    'J': 'Jubilee',
-    'M': 'Metropolitan',
-    'N': 'Northern',
-    'P': 'Piccadilly',
-    'V': 'Victoria',
-    'W': 'Waterloo & City',
+    #'london-overground': 'Overground',
+    'tram': 'Tram',
+    #'tfl-rail': 'TfL Rail',
+    'dlr': 'DLR',
+    'bakerloo': 'Bakerloo',
+    'central': 'Central',
+    'circle': 'Circle',
+    'district': 'District',
+    'hammersmith-city': 'Hammersmith & City',
+    'jubilee': 'Jubilee',
+    'metropolitan': 'Metropolitan',
+    'northern': 'Northern',
+    'piccadilly': 'Piccadilly',
+    'victoria': 'Victoria',
+    'waterloo-city': 'Waterloo & City',
 }
-if options.new:
-    lines = {
-        #'london-overground': 'Overground',
-        'tram': 'Tram',
-        #'tfl-rail': 'TfL Rail',
-        'dlr': 'DLR',
-        'bakerloo': 'Bakerloo',
-        'central': 'Central',
-        'circle': 'Circle',
-        'district': 'District',
-        'hammersmith-city': 'Hammersmith & City',
-        'jubilee': 'Jubilee',
-        'metropolitan': 'Metropolitan',
-        'northern': 'Northern',
-        'piccadilly': 'Piccadilly',
-        'victoria': 'Victoria',
-        'waterloo-city': 'Waterloo & City',
-    }
 
 def canon_station_name(s, line):
     """Given a station name, try and reword it to match the station list"""
@@ -241,17 +224,6 @@ def parse_json(live):
         parse_entry(prediction['timeToStation'], prediction['vehicleId'], dest_code,
             prediction['towards'], current_location, station_name, key, prediction['platformName'])
 
-def parse_xml(live):
-    stations = re.findall('<S Code="([^"]*)" N="([^"]*)">(.*?)</S>(?s)', live)
-    for station_code, station_name, station  in stations:
-        platforms = re.findall('<P N="([^"]*)" Code="([^"]*)"[^>]*>(.*?)</P>(?s)', station)
-        for platform_name, platform_code, platform in platforms:
-            trains = re.findall('<T S="(.*?)" T="(.*?)" D="(.*?)" C="(.*?)" L="(.*?)" DE="(.*?)" />', platform)
-            for set_id, trip_id, dest_code, time_to_station, current_location, destination in trains:
-                if current_location == '': continue
-                if 'Road 21' in station_name: continue # List doesn't have its location
-                if "Lord's Disused" in station_name: continue
-                parse_entry(time_to_station, set_id, dest_code, destination, current_location, station_name, key, platform_name)
 
 for key, line in lines.items():
     sub_id = 0
@@ -268,21 +240,19 @@ for key, line in lines.items():
             except urllib.error.HTTPError as e:
                 if e.code == 429:
                     #print live['message']
-                    m = re.search('Try again in (\d+) second', live['message'])
+                    print(live)
+                    m = re.search('Try again in (\d+) second', live)
                     time.sleep(int(m.group(1)))
                     continue
                 else:
-                    raise
+                    sys.exit(1)
             fp = open(dir + 'cache/%s' % key, 'wb')
             fp.write(live)
             fp.close()
             live = json.loads(live)
             break
 
-    if options.new:
-        parse_json(live)
-    else:
-        parse_xml(live)
+    parse_json(live)
 
 # Remove trains that have the same ID, but a higher time_to_station - probably the same train
 print_debug( "Removing duplicate trains")
@@ -305,7 +275,7 @@ def lookup(line, name):
         return (0,0)
     if line in station_locations[name]:
         return station_locations[name][line]
-    if options.new and options.debug: print(line, station_locations[name])
+    #print_debug(name, line, station_locations[name])
     try:
         return station_locations[name]['*']
     except:
