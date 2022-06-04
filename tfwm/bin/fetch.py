@@ -8,6 +8,7 @@ import time
 import datetime
 import os
 import os.path
+import sys
 
 import gtfs_realtime_pb2
 
@@ -28,10 +29,13 @@ try:
     live = open(DIR + 'cache/TfWM', 'rb').read()
 except:
     url = 'http://api.tfwm.org.uk/gtfs/trip_updates?app_id=%s&app_key=%s' % (APP_ID, APP_KEY)
-    live = urllib.request.urlopen(url).read()
-    fp = open(DIR + 'cache/TfWM', 'wb')
-    fp.write(live)
-    fp.close()
+    try:
+        live = urllib.request.urlopen(url).read()
+        fp = open(DIR + 'cache/TfWM', 'wb')
+        fp.write(live)
+        fp.close()
+    except:
+        sys.exit(1)
 
 try:
     if time.time() - os.path.getmtime(DIR + 'cache/TfWM-routes') > 3600:
@@ -39,10 +43,13 @@ try:
     lines = open(DIR + 'cache/TfWM-routes', 'rb').read()
 except:
     url = 'http://api.tfwm.org.uk/Line/Route?app_id=%s&app_key=%s&formatter=json' % (APP_ID, APP_KEY)
-    lines = urllib.request.urlopen(url).read()
-    fp = open(DIR + 'cache/TfWM-routes', 'wb')
-    fp.write(lines)
-    fp.close()
+    try:
+        lines = urllib.request.urlopen(url).read()
+        fp = open(DIR + 'cache/TfWM-routes', 'wb')
+        fp.write(lines)
+        fp.close()
+    except:
+        sys.exit(1)
 
 route_to_number = {}
 lines = json.loads(lines)
