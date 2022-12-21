@@ -244,9 +244,11 @@ for key, line in lines.items():
             except urllib.error.HTTPError as e:
                 if e.code == 429:
                     #print live['message']
-                    print(live)
-                    m = re.search('Try again in (\d+) second', live)
-                    time.sleep(int(m.group(1)))
+                    try:
+                        m = re.search('Try again in (\d+) second', live)
+                        time.sleep(int(m.group(1)))
+                    except:
+                        time.sleep(10)
                     continue
                 else:
                     sys.exit(1)
@@ -283,6 +285,8 @@ def lookup(line, name):
     try:
         return station_locations[name]['*']
     except:
+        if options.stations == 'stations.-schematic.json':
+            return random.choice(list(station_locations[name].values()))
         print('Error looking up', name, line, station_locations[name])
 
 print_debug ("Processing stations")
