@@ -2,10 +2,10 @@
 
 import json
 import re
-import urllib
+import urllib.request
 
 lines = set()
-for line in urllib.urlopen('http://countdown.api.tfl.gov.uk/interfaces/ura/instant_V1?ReturnList=LineName'):
+for line in urllib.request.urlopen(urllib.request.Request('http://countdown.api.tfl.gov.uk/interfaces/ura/instant_V1?ReturnList=LineName', headers={"User-Agent":""})):
     j = json.loads(line)
     if j[0] != 1: continue
     line = j[1]
@@ -24,4 +24,4 @@ out = ''
 for s in sorted(lines, key=sorting):
     out += '<option>%s\n' % s
 
-print out
+print(out)

@@ -74,7 +74,7 @@ for name, pts in station_locations.items():
                 station_locations[name]['circle'] = station_locations[name][old]
 
 lines = {
-    #'london-overground': 'Overground',
+    'london-overground': 'Overground',
     'tram': 'Tram',
     #'tfl-rail': 'TfL Rail',
     'dlr': 'DLR',
@@ -240,7 +240,9 @@ for key, line in lines.items():
     except:
         while True:
             try:
-                live = urllib.request.urlopen(api % key).read()
+                live = urllib.request.urlopen(api % key, timeout=10).read()
+            except urllib.error.URLError as e:
+                sys.exit(1)
             except urllib.error.HTTPError as e:
                 if e.code == 429:
                     #print live['message']
