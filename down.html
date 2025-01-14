@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en-gb">
+ <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>Live London Underground / bus maps</title>
+<style>
+body {
+    font-family: system-ui;
+    text-align: justify;
+    hyphens: auto;
+    line-height: 1.5;
+    max-width: 35em;
+    margin: 2em;
+    padding: 0;
+}
+a:active, a:hover {
+    color: #f00;
+}
+img { display: block; margin: 0 auto; max-width: 100%; }
+@media (min-width: 39em) {
+    img { float: right; margin-left: 1em; margin-right: -1em; }
+}
+</style>
+ </head>
+ <body>
+
+  <h1>Live London Underground / bus maps</h1>
+
+<p>
+Back in June 2010, I attended
+<a href="https://sciencehackday.org/london2010/">Science Hackday</a> in London.  The TfL API with open
+data had just been announced and I thought it’d be fun to build a live tube map
+based on the available information of arrival times at future stops.
+(<a href="https://www.flickr.com/photos/adactio/4717455763/in/pool-sciencehackday/">hard at work</a>, look at the tiny computer, tiny phone!).
+
+<p>
+<img src="Screenshot 2025-01-07 at 13.35.19.png.sm.png" alt="">
+This was the result, a page showing all the trains on the network in
+approximately real time, using “a bit of maths and magic” as I put it.
+I liked how occasionally trains would break away and
+zoom off based upon some miscalculation of where they should be.
+
+<p>It proved quite popular, with coverage from the <a href="https://www.bbc.co.uk/blogs/mindthegap/2010/06/where_is_your_tube_train_right.html">BBC</a>
+and the <a href="https://www.theguardian.com/technology/2010/jun/27/transport-for-london-live-tube-map">Guardian</a>
+to the <a href="https://www.dailymail.co.uk/sciencetech/article-1289533/Going-Underground-The-live-Tube-map-shows-train-network.html">Daily Mail</a>.
+In fact, it proved so popular that they had to <a href="https://www.theguardian.com/technology/blog/2010/jul/02/tfl-tube-map-api-overwhelmed-demand">take down the API</a>
+for a <a href="https://www.theguardian.com/technology/blog/2010/dec/14/underground-trains-live-maps-tfl-api">few months</a>
+due to demand (not from me! My site made few calls to generate the data, one per line every couple of minutes).
+
+<p>
+<img src="Screenshot 2025-01-07 at 13.35.22.png.sm.png" alt="">
+<img src="Screenshot 2025-01-07 at 13.35.21.png.sm.png" alt="">
+<img src="Screenshot 2025-01-07 at 13.35.24.png.sm.png" alt="">
+I added a Skyfall version after the <a href="https://youtu.be/2SedmeoNQ6k?t=160">film</a>’s release, a schematic map version later on
+(after I had time to work out all the co-ordinates!), and separately a map that
+did the <a href="https://londonist.com/london/transport/where-is-every-bus-in-london-right-now">same for buses and any London bus route</a>.
+
+<p>I have kept this running ever since, through API changes, bus route changes,
+server moves, and anything else that’s come up. TfL have never minded
+the site, as far as I am aware.
+
+<p>
+But then on 7th January 2025, I received two emails out of the blue; a <a
+href="email1.txt">vaguely personal one</a> from someone at TfL telling me to
+remove the schematic Tube map, and my <em>hosting provider</em> received a <a
+href="email2.txt">very impersonal one</a> from the “Trademark Enforcement
+team”. (That second one says “We informed the registrant of our complaint, but
+were unable to resolve this issue.” but presumably they can’t mean the first
+email sent about an hour earlier? This is the first I’ve ever heard from them.)
+
+<p>This is of course perfectly within their right so to do, though
+I would have hoped for a different approach.
+
+Sure, I could have made some changes and kept the maps up, although as above
+they have been fine with it for many years. But I believe it is possible
+to both “protect” your trademark (or whatever you think this is) and not treat
+people like this. And rewarding this heavy-handed approach (by continuing to
+provide a useful addition to their service with no contact bar this) to me feels wrong.
+
+<p>The internet isn’t what it was 15 years ago, and I can’t be bothered dealing
+with large organisations removing any semblance of joy from it. I’m sure they
+won’t care, but I am just too tired.
+
+<p>So sorry, the maps are all gone.
+
+<p>Feel free to contact TfL if you found these maps useful, or fun. Or if you
+work for some bit of TfL upset at what some other bit of TfL has done, do let
+them know.
+
+<p>My <a href="/">traintimes.org.uk</a> is still there.
+
+<p><a href="https://dracos.co.uk/">Matthew Somerville</a>
+
+<p>PS If you want live bus information and maps, there’s <a href="https://bustimes.org/">bustimes.org</a>.
+
+</body>
+</html>
