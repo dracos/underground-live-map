@@ -44,9 +44,6 @@ function load() {
             maxZoom: 13,
             minZoom: 10
         }).setView(TrainTimes.centre, 10);
-        L.imageOverlay('/map/tube/schematic/map.png', [[52.0,-1], [51,1]], {
-            alt: 'TfL tube map'
-        }).addTo(map);
         trains.addTo(map);
     } else {
         map = L.map('map', {
