@@ -74,7 +74,13 @@ for name, pts in station_locations.items():
                 station_locations[name]['circle'] = station_locations[name][old]
 
 lines = {
-    'london-overground': 'Overground',
+    'liberty': 'Liberty',
+    'lioness': 'Lioness',
+    'mildmay': 'Mildmay',
+    'suffragette': 'Suffragette',
+    'weaver': 'Weaver',
+    'windrush': 'Windrush',
+
     'tram': 'Tram',
     #'tfl-rail': 'TfL Rail',
     'dlr': 'DLR',
