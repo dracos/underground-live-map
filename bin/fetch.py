@@ -234,6 +234,9 @@ def parse_json(live):
         parse_entry(prediction['timeToStation'], prediction['vehicleId'], dest_code,
             prediction['towards'], current_location, station_name, key, prediction['platformName'])
 
+headers = {
+    'User-Agent': 'traintimes.org.uk/1.0'
+}
 
 for key, line in lines.items():
     sub_id = 0
@@ -246,7 +249,8 @@ for key, line in lines.items():
     except:
         while True:
             try:
-                live = urllib.request.urlopen(api % key, timeout=10).read()
+                req = urllib.request.Request(api % key, headers=headers)
+                live = urllib.request.urlopen(req, timeout=10).read()
             except urllib.error.URLError as e:
                 sys.exit(1)
             except urllib.error.HTTPError as e:
@@ -293,7 +297,7 @@ def lookup(line, name):
     try:
         return station_locations[name]['*']
     except:
-        if options.stations == 'stations.-schematic.json':
+        if options.stations == 'stations-schematic.json':
             return random.choice(list(station_locations[name].values()))
         print('Error looking up', name, line, station_locations[name])
 
