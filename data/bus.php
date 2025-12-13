@@ -127,6 +127,7 @@ foreach ($vehicles as $vehicle_id => $predictions) {
         'next' => $next,
         'left' => '',
         'point' => $point,
+        'colour' => $first[$col_DirectionID] > 1 ? '#66f' : '#f66',
     );
 }
 

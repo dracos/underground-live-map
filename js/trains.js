@@ -57,9 +57,12 @@ function load() {
         };
         if (TrainTimes.map == 'black') {
             tile_url = '/map/tube/skyfall/black.png';
+        } else if (TrainTimes.tile_url) {
+            tile_url = TrainTimes.tile_url;
+            layer_opts.attribution = TrainTimes.tile_attribution;
         } else {
             tile_url = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
-            layer_opts.attribution = 'Map tiles, data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>.';
+            layer_opts.attribution = 'Map tiles, data from <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
         }
         L.tileLayer(tile_url, layer_opts).addTo(map);
         trains.addTo(map);
@@ -110,7 +113,7 @@ if (TrainTimes.station_icon) {
 var train_marker = TrainTimes.train_marker || L.CircleMarker;
 var Train = train_marker.extend({
     initialize: function(train, options) {
-        var fillColor = train.title && (train.title.search(/to Special/) > -1) ? '#999' : TrainTimes.train_colour;
+        var fillColor = train.title && (train.title.search(/to Special/) > -1) ? '#999' : (train.colour || TrainTimes.train_colour);
         train_marker.prototype.initialize.call(this, train.point, {
             weight: 2,
             color: '#000',
