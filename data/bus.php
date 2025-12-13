@@ -44,6 +44,9 @@ foreach ($data as $line) {
             # Not 54.072286, 0.022315
             $point = array(51.3769688,-0.0987477);
         }
+        if ($j[$col_StopPointName] == "Ilford Sainsbury's") {
+            $point = array(51.55701, 0.07015);
+        }
         if ($point[0] == 0 && $point[1] == 0) {
             continue;
         }
@@ -91,6 +94,9 @@ foreach ($vehicles as $vehicle_id => $predictions) {
         $point = array( $p[$col_Latitude], $p[$col_Longitude] );
         if ($point[0] == 0 && $point[1] == 0 && $name == 'Summit Close') {
             $point = array(51.606065, -0.276948);
+        }
+        if ($name == "Ilford Sainsbury's") {
+            $point = array(51.55701, 0.07015);
         }
         $next[] = array(
             'dexp' => 'in ' . round($mins*2)/2 . ' minute' . (round(round($mins*2)/2)==1?'':'s'),
