@@ -155,6 +155,7 @@ var Train = train_marker.extend({
         this.string = train.string;
         this.link = train.link
         this.route = train.next;
+        if (train.colour) this.setStyle({ fillColor: train.colour });
     },
     calculateLocation: function(secs) {
         var point = 0;
