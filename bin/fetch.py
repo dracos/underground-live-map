@@ -5,6 +5,7 @@ The client side code uses london.js for its static source data, e.g. geography o
 from __future__ import division 
 from collections import OrderedDict
 import datetime
+import random
 import urllib.request
 import re
 import simplejson as json
