@@ -8,7 +8,7 @@ import datetime
 import random
 import urllib.request
 import re
-import simplejson as json
+import json
 import time
 import os
 import os.path
@@ -111,7 +111,7 @@ def canon_station_name(s, line):
     s = s.replace('Camden Town (20B-20A)', 'Camden Town')
     s = s.replace('Camden Town at Point 20A', 'Camden Town')
     s = re.sub('^Central$', 'Finchley Central', s) # They say "Between Central and East Finchley"
-    s = re.sub('\s*Platform \d+$', '', s)
+    s = re.sub(r'\s*Platform \d+$', '', s)
     if line == 'tram':
         s = s + ' Tram Stop'
     elif line in ('dlr', 'london-overground', 'elizabeth'):
@@ -188,10 +188,10 @@ def parse_time(s):
     if isinstance(s, int): return s
 
     if s == '-' or s == 'due': return 0
-    m = re.match('(\d+):(\d+):(\d+)$', s)
+    m = re.match(r'(\d+):(\d+):(\d+)$', s)
     if m:
         return int(m.group(1))*3600 + int(m.group(2))*60 + int(m.group(3))
-    m = re.match('(\d+):(\d+)$', s)
+    m = re.match(r'(\d+):(\d+)$', s)
     if not m:
         raise Exception('Did not match time %s' % s)
     return int(m.group(1))*60 + int(m.group(2))
@@ -208,7 +208,7 @@ def parse_entry(time_to_station, set_id, dest_code, destination, current_locatio
     train_key += '-%s' % dest_code
     if set_id in ('000', '477') or destination in ('Unknown', 'Special', 'Network Rail TOC') or dest_code == '0':
     #or (set_id in ('015', '062', '113', '124') and key == 'N'):
-        lookup = re.sub('\s*Platform \d+$', '', current_location)
+        lookup = re.sub(r'\s*Platform \d+$', '', current_location)
         if current_location == 'At Platform':
             lookup = 'At %s' % station_name
         if not sub_ids.get(lookup):
@@ -216,7 +216,7 @@ def parse_entry(time_to_station, set_id, dest_code, destination, current_locatio
             sub_id += 1
         train_key += '-%s' % sub_ids[lookup]
     entry = {
-        'station_name': canon_station_name(re.sub('\.$', '', station_name), key),
+        'station_name': canon_station_name(re.sub(r'\.$', '', station_name), key),
         'platform_name': platform_name,
         'current_location': current_location,
         'time_to_station': time_to_station,
@@ -258,7 +258,7 @@ for key, line in lines.items():
                 if e.code == 429:
                     #print live['message']
                     try:
-                        m = re.search('Try again in (\d+) second', live)
+                        m = re.search(r'Try again in (\d+) second', live)
                         time.sleep(int(m.group(1)))
                     except:
                         time.sleep(10)
